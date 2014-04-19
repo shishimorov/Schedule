@@ -1,0 +1,30 @@
+object MainForm: TMainForm
+  Left = 600
+  Height = 706
+  Top = 156
+  Width = 678
+  Caption = 'MainForm'
+  Menu = MainMenu
+  OnClose = FormClose
+  OnCreate = FormCreate
+  LCLVersion = '1.2.0.3'
+  object MainMenu: TMainMenu
+    left = 320
+    top = 232
+    object MFile: TMenuItem
+      Caption = 'Файл'
+      object MExit: TMenuItem
+        Caption = 'Выход'
+      end
+    end
+    object MTables: TMenuItem
+      Caption = 'Таблицы'
+    end
+    object MHelp: TMenuItem
+      Caption = 'Справка'
+      object MAbout: TMenuItem
+        Caption = 'О программе'
+      end
+    end
+  end
+end
