@@ -8,10 +8,10 @@ uses
   Classes, SysUtils, Controls, StdCtrls, Spin, StrUtils;
 
 type
-  TDBEditWBH = class(TObject)
+  TDBEditWBH = class(TPersistent)
   public
     constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth, AHeight: integer;
-      AOnChange: TNotifyEvent; AOnKeyPress: TKeyPressEvent); virtual; abstract;
+      AOnChange: TNotifyEvent); virtual; abstract;
   protected
     function GetText: string; virtual; abstract;
     procedure SetText(AValue: string); virtual; abstract;
@@ -25,7 +25,7 @@ type
   TTextEdit = class(TDBEditWBH)
   public
     constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth, AHeight: integer;
-      AOnChange: TNotifyEvent; AOnKeyPress: TKeyPressEvent); override;
+      AOnChange: TNotifyEvent); override;
     destructor Destroy; override;
   protected
     function GetText: string; override;
@@ -36,10 +36,18 @@ type
     FEdit: TEdit;
   end;
 
+  TIntEdit = class(TTextEdit)
+  public
+    constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth, AHeight: integer;
+      AOnChange: TNotifyEvent); override;
+  private
+    procedure FOnKeyPress(Sender: TObject; var Key: char);
+  end;
+
   TTimeEdit = class(TDBEditWBH)
   public
     constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth, AHeight: integer;
-      AOnChange: TNotifyEvent; AOnKeyPress: TKeyPressEvent); override;
+      AOnChange: TNotifyEvent); override;
     destructor Destroy; override;
   protected
     function GetText: string; override;
@@ -53,7 +61,7 @@ type
 implementation
 
 constructor TTextEdit.Create(TheOwner: TComponent; ALeft, ATop, AWidth,
-  AHeight: integer; AOnChange: TNotifyEvent; AOnKeyPress: TKeyPressEvent);
+  AHeight: integer; AOnChange: TNotifyEvent);
 begin
   FEdit := TEdit.Create(TheOwner);
   with FEdit do begin
@@ -64,7 +72,6 @@ begin
     Height := AHeight;
     Text := '';
     OnChange := AOnChange;
-    OnKeyPress := AOnKeyPress;
   end;
 end;
 
@@ -93,8 +100,20 @@ begin
   FEdit.Enabled := AValue;
 end;
 
+constructor TIntEdit.Create(TheOwner: TComponent; ALeft, ATop, AWidth,
+  AHeight: integer; AOnChange: TNotifyEvent);
+begin
+  inherited Create(TheOwner, ALeft, ATop, AWidth, AHeight, AOnChange);
+  FEdit.OnKeyPress := @FOnKeyPress;
+end;
+
+procedure TIntEdit.FOnKeyPress(Sender: TObject; var Key: char);
+begin
+  if (not (Key in ['0'..'9'])) and (Key <> #8) then Key := #0;
+end;
+
 constructor TTimeEdit.Create(TheOwner: TComponent; ALeft, ATop, AWidth,
-  AHeight: integer; AOnChange: TNotifyEvent; AOnKeyPress: TKeyPressEvent);
+  AHeight: integer; AOnChange: TNotifyEvent);
 begin
   FEdit[1] := TSpinEdit.Create(TheOwner);
   with FEdit[1] do begin
@@ -107,7 +126,6 @@ begin
     MaxValue := 23;
     Value := 0;
     OnChange := AOnChange;
-    OnKeyPress := AOnKeyPress;
   end;
   //FEdit[2].Assign(FEdit[1]);
   //with FEdit[2] do begin
@@ -127,7 +145,6 @@ begin
     MaxValue := 60;
     Value := 0;
     OnChange := AOnChange;
-    OnKeyPress := AOnKeyPress;
   end;
   FEdit[3] := TSpinEdit.Create(TheOwner);
   with FEdit[3] do begin
@@ -140,7 +157,6 @@ begin
     MaxValue := 60;
     Value := 0;
     OnChange := AOnChange;
-    OnKeyPress := AOnKeyPress;
   end;
 end;
 

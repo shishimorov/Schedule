@@ -72,14 +72,12 @@ begin
   case ADataType of
   dtInt, dtStr:
     begin
-      FSearchEdit := TTextEdit.Create(SearchBox, 2, 33, 292, 27,
-        @SearchQueryChange, @SearchEditKeyPress);
+      FSearchEdit := TTextEdit.Create(SearchBox, 2, 33, 292, 27, @SearchQueryChange);
       InitSearchBtn(296, 33);
     end;
   dtTime:
     begin
-      FSearchEdit := TTimeEdit.Create(SearchBox, 2, 33, 50, 27,
-        @SearchQueryChange, @SearchEditKeyPress);
+      FSearchEdit := TTimeEdit.Create(SearchBox, 2, 33, 50, 27, @SearchQueryChange);
       InitSearchBtn(158, 33);
     end;
   end;

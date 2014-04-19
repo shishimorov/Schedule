@@ -123,13 +123,13 @@ begin
   case ADataType of
   dtInt:
     FFilterEdit :=
-      TTextEdit.Create(FilterBox, 2, 31, 265, 27, SearchQueryChange, @FilterEditKeyPress);
+      TTextEdit.Create(FilterBox, 2, 31, 265, 27, SearchQueryChange);
   dtStr:
     FFilterEdit :=
-      TTextEdit.Create(FilterBox, 2, 31, 265, 27, SearchQueryChange, nil);
+      TTextEdit.Create(FilterBox, 2, 31, 265, 27, SearchQueryChange);
   dtTime:
     FFilterEdit :=
-      TTimeEdit.Create(FilterBox, 65, 31, 50, 27, SearchQueryChange, nil);
+      TTimeEdit.Create(FilterBox, 65, 31, 50, 27, SearchQueryChange);
   end;
 end;
 

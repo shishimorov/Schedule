@@ -110,13 +110,13 @@ begin
       case ATable.Fields[i].DataType of
       dtInt:
         DBEditArr[high(DBEditArr)] :=
-          TTextEdit.Create(self, 200, i*32+10, 180, 27, nil, @FOnKeyPress);
+          TTextEdit.Create(self, 200, i*32+10, 180, 27, nil);
       dtStr:
         DBEditArr[high(DBEditArr)] :=
-          TTextEdit.Create(self, 200, i*32+10, 180, 27, nil, nil);
+          TTextEdit.Create(self, 200, i*32+10, 180, 27, nil);
       dtTIme:
         DBEditArr[high(DBEditArr)] :=
-          TTimeEdit.Create(self, 200, i*32+10, 59, 27, nil, nil);
+          TTimeEdit.Create(self, 200, i*32+10, 59, 27, nil);
       end;
 
       if FMode = qmUpdate then
