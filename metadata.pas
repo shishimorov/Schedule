@@ -15,7 +15,7 @@ const
   ORDER_BY_IND = 4;
 
 type
-  TDataType = (dtInt, dtStr, dtTime);
+  TDataType = (dtInt, dtStr, dtTime, dtList);
 
   TFieldInfo = class(TObject)
   public
@@ -31,10 +31,10 @@ type
 
   TRefFieldInfo = class(TFieldInfo)
   public
-    procedure SetReference(ATable, ARefField, AField: string);
+    procedure SetReference(ATable, AKeyField, AListField, AOrderByField: string);
     function GetFieldName: string; override;
   public
-    RefTableName, RefFieldName, FieldName: string;
+    RefTableName, KeyFieldName, ListFieldName, OrderByField: string;
   end;
 
   TFields = array of TFieldInfo;
@@ -44,10 +44,11 @@ type
     constructor Create(AName, ACaption: string);
     procedure AddField(AVisible: boolean; AName, ACaption: string; AWidth: integer;
       ADataType: TDataType); overload;
-    procedure AddField(AVisible: boolean; AName, ACaption, ATable, ARefField,
-      AField: string; AWidth: integer; ADataType: TDataType); overload;
+    procedure AddField(AVisible: boolean; AName, ACaption, ATable, AKeyField,
+      AListField, AOrderByField: string; AWidth: integer; ADataType: TDataType); overload;
     function GetSQLQuery: TStringList;
     function GetFullFieldName(AFieldIndex: integer): string;
+    function GetOrderByFieldName(AFieldIndex: integer): string;
   public
     Name, Caption: string;
     Fields: TFields;
@@ -88,14 +89,15 @@ end;
 
 function TRefFieldInfo.GetFieldName: string;
 begin
-  Result := FieldName
+  Result := ListFieldName
 end;
 
-procedure TRefFieldInfo.SetReference(ATable, ARefField, AField: string);
+procedure TRefFieldInfo.SetReference(ATable, AKeyField, AListField, AOrderByField: string);
 begin
   RefTableName := ATable;
-  RefFieldName := ARefField;
-  FieldName := AField;
+  KeyFieldName := AKeyField;
+  ListFieldName := AListField;
+  OrderByField := AOrderByField;
 end;
 
 constructor TTableInfo.Create(AName, ACaption: string);
@@ -112,13 +114,13 @@ begin
     ADataType);
 end;
 
-procedure TTableInfo.AddField(AVisible: boolean; AName, ACaption, ATable, ARefField,
-  AField: string; AWidth: integer; ADataType: TDataType);
+procedure TTableInfo.AddField(AVisible: boolean; AName, ACaption, ATable, AKeyField,
+  AListField, AOrderByField: string; AWidth: integer; ADataType: TDataType);
 begin
   SetLength(Fields, Length(Fields) + 1);
-  Fields[high(Fields)] := TRefFieldInfo.Create(AVisible, AName, ACaption, AWidth,
-    ADataType);
-  (Fields[high(Fields)] as TRefFieldInfo).SetReference(ATable, ARefField, AField);
+  Fields[high(Fields)] := TRefFieldInfo.Create(AVisible, AName, ACaption, AWidth, ADataType);
+  with Fields[high(Fields)] as TRefFieldInfo do
+    SetReference(ATable, AKeyField, AListField, AOrderByField);
 end;
 
 function TTableInfo.GetSQLQuery: TStringList;
@@ -134,11 +136,11 @@ begin
 
   for i := 0 to high(Fields) do begin
     if Fields[i] is TRefFieldInfo then begin
-      sqlSelect += Format('%s.%s, ', [(Fields[i] as TRefFieldInfo).RefTableName,
-        (Fields[i] as TRefFieldInfo).FieldName]);
+      sqlSelect += Format('%s.%s, %s.%s, ', [(Fields[i] as TRefFieldInfo).RefTableName,
+        (Fields[i] as TRefFieldInfo).ListFieldName, Name, Fields[i].Name]);
       sqlFrom += Format('INNER JOIN %s ON %s.%s = %s.%s ',
         [(Fields[i] as TRefFieldInfo).RefTableName, Name, Fields[i].Name,
-        (Fields[i] as TRefFieldInfo).RefTableName, (Fields[i] as TRefFieldInfo).RefFieldName]);
+        (Fields[i] as TRefFieldInfo).RefTableName, (Fields[i] as TRefFieldInfo).KeyFieldName]);
     end
     else sqlSelect += Format('%s.%s, ', [Name, Fields[i].Name]);
   end;
@@ -157,6 +159,15 @@ begin
   if Fields[AFieldIndex] is TRefFieldInfo then
     Result := Format('%s.%s', [(Fields[AFieldIndex] as TRefFieldInfo).RefTableName,
       Fields[AFieldIndex].GetFieldName])
+  else
+    Result := Format('%s.%s', [Name, Fields[AFieldIndex].Name]);
+end;
+
+function TTableInfo.GetOrderByFieldName(AFieldIndex: integer): string;
+begin
+  if Fields[AFieldIndex] is TRefFieldInfo then
+    with Fields[AFieldIndex] as TRefFieldInfo do
+      Result := Format('%s.%s', [RefTableName, OrderByField])
   else
     Result := Format('%s.%s', [Name, Fields[AFieldIndex].Name]);
 end;
@@ -207,23 +218,23 @@ begin
     end;
     with AddTable('Professors_Subjects', 'Специализация преподавателей') do begin
       AddField(True, 'ID', 'ID', 40, dtInt);
-      AddField(True, 'Professor_ID', 'Преподаватель', 'Professors', 'ID', 'Name', 120, dtInt);
-      AddField(True, 'Subject_ID', 'Предмет', 'Subjects', 'ID', 'Name', 400, dtStr);
+      AddField(True, 'Professor_ID', 'Преподаватель', 'Professors', 'ID', 'Name', 'Name', 120, dtList);
+      AddField(True, 'Subject_ID', 'Предмет', 'Subjects', 'ID', 'Name', 'Name', 400, dtList);
     end;
     with AddTable('Subjects_Groups', 'Предметы по группам') do begin
       AddField(True, 'ID', 'ID', 40, dtInt);
-      AddField(True, 'Subject_ID', 'Предмет', 'Subjects', 'ID', 'Name', 425, dtStr);
-      AddField(True, 'Group_ID', 'Группа', 'Groups', 'ID', 'Name', 100, dtStr);
+      AddField(True, 'Subject_ID', 'Предмет', 'Subjects', 'ID', 'Name', 'Name', 425, dtList);
+      AddField(True, 'Group_ID', 'Группа', 'Groups', 'ID', 'Name', 'Name', 100, dtList);
     end;
     with AddTable('Schedule_Items', 'Расписание') do begin
       AddField(True, 'ID', 'ID', 40, dtInt);
-      AddField(True, 'Subject_ID', 'Предмет', 'Subjects', 'ID', 'Name', 200, dtStr);
-      AddField(True, 'Subject_Type_ID', 'Тип', 'Subject_Types', 'ID', 'Name', 60, dtStr);
-      AddField(True, 'Professor_ID', 'Преподаватель', 'Professors', 'ID', 'Name', 150, dtStr);
-      AddField(True, 'Lesson_Index', 'Пара №', 'Lessons', 'ID', '"Index"', 80, dtInt);
-      AddField(True, 'Day_Index', 'День недели', 'Days', 'ID', '"Index"', 130, dtInt);
-      AddField(True, 'Group_ID', 'Группа', 'Groups', 'ID', 'Name', 130, dtStr);
-      AddField(True, 'Room_ID', 'Аудитория', 'Rooms', 'ID', 'Name', 130, dtStr);
+      AddField(True, 'Subject_ID', 'Предмет', 'Subjects', 'ID', 'Name', 'Name', 200, dtList);
+      AddField(True, 'Subject_Type_ID', 'Тип', 'Subject_Types', 'ID', 'Name', 'Name', 60, dtList);
+      AddField(True, 'Professor_ID', 'Преподаватель', 'Professors', 'ID', 'Name', 'Name', 150, dtList);
+      AddField(True, 'Lesson_Index', 'Пара №', 'Lessons', 'ID', '"Index"', '"Index"', 80, dtList);
+      AddField(True, 'Day_Index', 'День недели', 'Days', 'ID', 'Name', '"Index"', 130, dtList);
+      AddField(True, 'Group_ID', 'Группа', 'Groups', 'ID', 'Name', 'Name', 130, dtList);
+      AddField(True, 'Room_ID', 'Аудитория', 'Rooms', 'ID', 'Name', 'Name', 130, dtList);
       AddField(True, 'Week', 'Неделя', 80, dtInt);
     end;
   end;

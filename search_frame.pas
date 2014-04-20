@@ -23,7 +23,6 @@ type
     procedure MoveFilterTimerTimer(Sender: TObject);
     procedure SearchQueryChange(Sender: TObject);
     procedure FieldBoxChange(Sender: TObject);
-    procedure SearchEditKeyPress(Sender: TObject; var Key: char);
     procedure SearchBtnClick(Sender: TObject);
     procedure CloseFilterClick(AFilterIndex: integer);
   public
@@ -40,7 +39,6 @@ type
     FSearchBtn: TSpeedButton;
     FFilters: array of TFilterFrame;
     FClosedFilterIndex, FFinalHeight: integer;
-    //HelpLabel: TLabel;
   const
     FILTER_LIMIT = 10;
   end;
@@ -69,18 +67,8 @@ end;
 procedure TSearchFrame.InitSearchEdit(ADataType: TDataType);
 begin
   FSearchEdit.Free;
-  case ADataType of
-  dtInt, dtStr:
-    begin
-      FSearchEdit := TTextEdit.Create(SearchBox, 2, 33, 292, 27, @SearchQueryChange);
-      InitSearchBtn(296, 33);
-    end;
-  dtTime:
-    begin
-      FSearchEdit := TTimeEdit.Create(SearchBox, 2, 33, 50, 27, @SearchQueryChange);
-      InitSearchBtn(158, 33);
-    end;
-  end;
+  FSearchEdit := GetEditClass(ADataType).Create(SearchBox, 2, 33, 292, 27, @SearchQueryChange);
+  InitSearchBtn(296, 33);
 end;
 
 procedure TSearchFrame.InitSearchBtn(ALeft, ATop: integer);
@@ -107,25 +95,19 @@ begin
   FSQLQuery.Close;
   FieldName := FTable.GetFullFieldName(FieldBox.ItemIndex);
 
-  if FSearchEdit.Text <> '' then begin
+  if FSearchEdit.Value <> '' then begin
     case FTable.Fields[FieldBox.ItemIndex].DataType of
-    dtInt:
-      begin
-        FSQLQuery.SQL.Strings[WHERE_IND] :=
-          Format('WHERE %s = :SearchValue', [FieldName]);
-        FSQLQuery.ParamByName('SearchValue').AsInteger := StrToInt(FSearchEdit.Text);
-      end;
     dtStr:
       begin
         FSQLQuery.SQL.Strings[WHERE_IND] :=
           Format('WHERE POSITION(UPPER(:SearchValue), UPPER(%s)) = 1', [FieldName]);
-        FSQLQuery.ParamByName('SearchValue').AsString := FSearchEdit.Text;
+        FSQLQuery.ParamByName('SearchValue').AsString := FSearchEdit.Value;
       end;
-    dtTime:
+    else
       begin
         FSQLQuery.SQL.Strings[WHERE_IND] :=
           Format('WHERE %s = :SearchValue', [FieldName]);
-        FSQLQuery.ParamByName('SearchValue').AsTime := StrToTime(FSearchEdit.Text);
+        FSQLQuery.ParamByName('SearchValue').Value := FSearchEdit.Value;
       end;
     end;
   end
@@ -147,17 +129,6 @@ begin
           1: Cond := 'OR';
           end;
           FSQLQuery.ParamByName(ParamQuery.ParamName).Value := ParamQuery.ParamValue
-          //case ParamQuery.ParamType of
-          //dtInt:
-          //  FSQLQuery.ParamByName(ParamQuery.ParamName).AsInteger :=
-          //    StrToInt(ParamQuery.ParamValue);
-          //dtStr:
-          //  FSQLQuery.ParamByName(ParamQuery.ParamName).AsString :=
-          //    ParamQuery.ParamValue;
-          //dtTime:
-          //  FSQLQuery.ParamByName(ParamQuery.ParamName).AsTime :=
-          //    StrToTime(ParamQuery.ParamValue);
-          //end;
         end;
       end;
     end;
@@ -172,16 +143,6 @@ procedure TSearchFrame.FieldBoxChange(Sender: TObject);
 begin
   InitSearchEdit(FTable.Fields[FieldBox.ItemIndex].DataType);
   SearchQueryChange(self);
-end;
-
-procedure TSearchFrame.SearchEditKeyPress(Sender: TObject; var Key: char);
-begin
-  if (Key = #13) or (Key = #10) then begin
-    if FSearchBtn.Enabled then SearchBtnClick(self);
-    Exit;
-  end;
-  if FTable.Fields[FieldBox.ItemIndex].DataType = dtInt then
-    if (not (Key in ['0'..'9'])) and (Key <> #8) then Key := #0;
 end;
 
 procedure TSearchFrame.SearchQueryChange(Sender: TObject);
@@ -208,7 +169,7 @@ begin
     Tag := Length(FFilters);
     Top := high(FFilters) * Height;
     Name := Format('FilterFrame_%d', [Tag]);
-    FilterBox.Caption := Format('Фильтр %d', [Tag]);
+    //FilterBox.Caption := Format('Фильтр %d', [Tag]);
     SearchQueryChange := @self.SearchQueryChange;
     CloseFilter := @CloseFilterClick;
     Prepare(self.FTable);
@@ -230,9 +191,9 @@ begin
     FFilters[i] := FFilters[i+1];
     with FFilters[i] do begin
       Tag := FFilters[i].Tag - 1;
-      Caption := Format('Фильтр %d', [Tag]);
+      //Caption := Format('Фильтр %d', [Tag]);
       Name := Format('FilterFrame_%d', [Tag]);
-      FilterBox.Caption := Format('Фильтр %d', [Tag]);
+      //FilterBox.Caption := Caption;
     end;
   end;
   SetLength(FFilters, Length(FFilters) - 1);

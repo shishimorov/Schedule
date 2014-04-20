@@ -13,6 +13,8 @@ type
 
   { TRefForm }
 
+  TEditForms = array of TEditForm;
+
   TRefForm = class(TForm)
     Datasource: TDatasource;
     DBGrid: TDBGrid;
@@ -33,14 +35,21 @@ type
     procedure PrepareDBGrid(var ATable: TTableInfo);
     procedure InitSearchFrame;
   private
-    function GetColumnName(AFieldName: string): string;
+    procedure RemoveInvalidPointers(var AObjects: TEditForms);
+    function GetColumnName(const AFieldName: string): string;
   private
-    FEditForm: TEditForm;
-    FEditQueryArr: array of TSQLQuery;
-    FEditDSArr: array of TDataSource;
+    FEditForms: TEditForms;
+    FRefQueryArr: array of TSQLQuery;
+    FRefDSArr: array of TDataSource;
     FSearchFrame: TSearchFrame;
     FTable: TTableInfo;
     FSortedColInd: integer;
+  const
+    CleanFrequency = 2;
+    MB_YES = 6;
+    MB_NO = 7;
+    MB_YESNO = 4;
+    MB_ICONWARNING = 48;
   end;
 
 implementation
@@ -48,62 +57,86 @@ implementation
 {$R *.lfm}
 
 procedure TRefForm.DBGridTitleClick(Column: TColumn);
-var ColInd, i: integer;
+var FieldName: string;
 begin
   SQLQuery.Close;
 
   if FSortedColInd <> -1 then
     DBGrid.Columns[FSortedColInd].Title.ImageIndex := -1;
+  if FSortedColInd <> Column.Index then DBGrid.SortOrder := soAscending;
 
-  for i := 0 to DBGrid.Columns.Count - 1 do
-    if DBGrid.Columns[i].FieldName = Column.FieldName then begin
-      ColInd := i;
-      break;
-    end;
-
-  if FSortedColInd <> ColInd then DBGrid.SortOrder := soAscending;
-
+  FieldName := FTable.GetOrderByFieldName(Column.Index);
   if DBGrid.SortOrder = soAscending then begin
     DBGrid.SortOrder := soDescending;
-    SQLQuery.SQL.Strings[ORDER_BY_IND] := Format('ORDER BY %d desc', [ColInd + 1]);
+    SQLQuery.SQL.Strings[ORDER_BY_IND] := Format('ORDER BY %s desc', [FieldName]);
     Column.Title.ImageIndex := 1;
   end
   else begin
     DBGrid.SortOrder := soAscending;
-    SQLQuery.SQL.Strings[ORDER_BY_IND] := Format('ORDER BY %d asc', [ColInd + 1]);
+    SQLQuery.SQL.Strings[ORDER_BY_IND] := Format('ORDER BY %s asc', [FieldName]);
     Column.Title.ImageIndex := 0;
   end;
 
-  FSortedColInd := ColInd;
+  FSortedColInd := Column.Index;
+  //ShowMessage(SQLQuery.SQL.Text);
   SQLQuery.Open;
 end;
 
 procedure TRefForm.InsertBtnClick(Sender: TObject);
 begin
-  FEditForm.Free;
-  FEditForm := TEditForm.Create(self);
-  FEditForm.Prepare(FTable, DataSource, SQLQuery, DBGrid.Columns, FEditDSArr, qmInsert);
-  FEditForm.ShowModal;
+  if Length(FEditForms) > CleanFrequency then RemoveInvalidPointers(FEditForms);
+  SetLength(FEditForms, Length(FEditForms)+1);
+  FEditForms[high(FEditForms)] := TEditForm.Create(self);
+  with FEditForms[high(FEditForms)] do begin
+    Prepare(FTable, DataSource, SQLQuery, DBGrid.Columns, FRefDSArr, qmInsert);
+    Tag := -1;
+    Show;
+  end;
 end;
 
 procedure TRefForm.DeleteBtnClick(Sender: TObject);
+var
+  FieldID: integer;
+  SavedSQL: string;
 begin
-  ConfirmForm := TConfirmForm.Create(self);
-  ConfirmForm.Prepare(SQLQuery, FTable.Name);
-  ConfirmForm.ShowModal;
+  if Application.MessageBox('Вы действительно хотите удалить данную запись?',
+    'Подтверждение', (MB_YESNO + MB_ICONWARNING)) = MB_YES then begin
+    with SQLQuery do begin
+      FieldID := FieldByName('ID').AsInteger;
+      Close;
+      SavedSQL := SQL.Text;
+      SQL.Text := Format('DELETE FROM %s WHERE ID = %d', [FTable.Name, FieldID]);
+      ExecSQL;
+      SQL.Text := SavedSQL;
+      Open;
+    end;
+  end;
 end;
 
 procedure TRefForm.EditBtnClick(Sender: TObject);
+var RecID, i: integer;
 begin
-  FEditForm.Free;
-  FEditForm := TEditForm.Create(self);
-  FEditForm.Prepare(FTable, DataSource, SQLQuery, DBGrid.Columns, FEditDSArr, qmUpdate);
-  FEditForm.ShowModal;
+  if Length(FEditForms) > CleanFrequency then RemoveInvalidPointers(FEditForms);
+  RecID := SQLQuery.FieldByName('ID').AsInteger;
+  for i := 0 to high(FEditForms) do
+    if FEditForms[i].Tag = RecID then begin
+      FEditForms[i].Show;
+      Exit;
+    end;
+  SetLength(FEditForms, Length(FEditForms)+1);
+  FEditForms[high(FEditForms)] := TEditForm.Create(self);
+  with FEditForms[high(FEditForms)] do begin
+    Prepare(FTable, DataSource, SQLQuery, DBGrid.Columns, FRefDSArr, qmUpdate);
+    Tag := RecID;
+    Show;
+  end;
 end;
 
 procedure TRefForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+var i: integer;
 begin
-  FEditForm.Free;
+  for i := 0 to high(FEditForms) do
+    if FEditForms[i] <> nil then FEditForms[i].Free;
 end;
 
 procedure TRefForm.DBGridDblClick(Sender: TObject);
@@ -131,23 +164,23 @@ begin
     end;
 
     if FTable.Fields[i] is TRefFieldInfo then begin
-      SetLength(FEditQueryArr, Length(FEditQueryArr)+1);
-      FEditQueryArr[high(FEditQueryArr)] := TSQLQuery.Create(self);
-      with FEditQueryArr[high(FEditQueryArr)] do begin
+      SetLength(FRefQueryArr, Length(FRefQueryArr)+1);
+      FRefQueryArr[high(FRefQueryArr)] := TSQLQuery.Create(self);
+      with FRefQueryArr[high(FRefQueryArr)] do begin
         DataBase := DBCon.IBConnection;
         Transaction := DBCon.SQLTransaction;
         SQL.Text := Format('SELECT t.%s, t.%s FROM %s t',
-          [(FTable.Fields[i] as TRefFieldInfo).RefFieldName,
-          (FTable.Fields[i] as TRefFieldInfo).FieldName,
+          [(FTable.Fields[i] as TRefFieldInfo).KeyFieldName,
+          (FTable.Fields[i] as TRefFieldInfo).ListFieldName,
           (FTable.Fields[i] as TRefFieldInfo).RefTableName]);
         Open;
       end;
 
-      SetLength(FEditDSArr, Length(FEditDSArr)+1);
-      FEditDSArr[high(FEditDSArr)] := TDataSource.Create(self);
-      FEditDSArr[high(FEditDSArr)].DataSet := FEditQueryArr[high(FEditQueryArr)];
+      SetLength(FRefDSArr, Length(FRefDSArr)+1);
+      FRefDSArr[high(FRefDSArr)] := TDataSource.Create(self);
+      FRefDSArr[high(FRefDSArr)].DataSet := FRefQueryArr[high(FRefQueryArr)];
 
-      FEditQueryArr[high(FEditQueryArr)].Open;
+      FRefQueryArr[high(FRefQueryArr)].Open;
     end;
   end;
   SQLQuery.Open;
@@ -162,21 +195,34 @@ begin
   FilterPanel.InsertControl(FSearchFrame);
 end;
 
-function TRefForm.GetColumnName(AFieldName: string): string;
+procedure TRefForm.RemoveInvalidPointers(var AObjects: TEditForms);
+var i, j, k: integer;
+begin
+  j := -1;
+  k := 0;
+  for i := 0 to high(AObjects) do
+    if Assigned(AObjects[i]) then begin
+      j := i;
+      inc(k);
+    end
+    else
+      if j >= 0 then begin
+        AObjects[j] := AObjects[i];
+        AObjects[i] := nil;
+        j := -1;
+      end;
+  SetLength(AObjects, Length(AObjects)-k);
+end;
+
+function TRefForm.GetColumnName(const AFieldName: string): string;
 var i, j: integer;
 begin
-  if (Pos('"', AFieldName) = 1) and (AFieldName[Length(AFieldName)] = '"') then
-  begin
-    Delete(AFieldName, 1, 1);
-    Delete(AFieldName, Length(AFieldName), 1);
-  end;
+  Result := AnsiDequotedStr(AFieldName, '"');
   j := 0;
   for i := 0 to DBGrid.Columns.Count - 1 do
-    if Pos(AFieldName, DBGrid.Columns[i].FieldName) > 0 then inc(j);
-  if j = 0 then
-    Result := AFieldName
-  else
-    Result := Format('%s_%d', [AFieldName, j]);
+    if Pos(Result, DBGrid.Columns[i].FieldName) > 0 then inc(j);
+  if j > 0 then
+    Result := Format('%s_%d', [Result, j]);
 end;
 
 end.

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  DbCtrls, DBGrids, Buttons, ExtCtrls, ComCtrls, ButtonPanel, db, sqldb,
+  DbCtrls, DBGrids, Buttons, ExtCtrls, ButtonPanel, db, sqldb,
   metadata, db_edit;
 
 type
@@ -24,18 +24,13 @@ type
     procedure CancelButtonClick(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
   public
-    procedure Prepare(ATable: TTableInfo; ADataSource: TDataSource;
-      ASQLQuery: TSQLQuery; AColumns: TDBGridColumns;
-      AEditDSArr: TDataSourceArr; AMode: TQueryMode);
-  private
-    function GetCorrectFieldName(const AFieldName: string): string;
-    procedure FOnKeyPress(Sender: TObject; var Key: char);
+    procedure Prepare(ATable: TTableInfo; ADataSource: TDataSource; ASQLQuery: TSQLQuery;
+      AColumns: TDBGridColumns; ARefDSArr: TDataSourceArr; AMode: TQueryMode);
   private
     FTable: TTableInfo;
     FDataSource: TDataSource;
     FSQLQuery: TSQLQuery;
-    DBEditArr: array of TDBEditWBH;
-    DBComboBoxArr: array of TDBLookupComboBox;
+    DBEdits: array of TDBEditWBH;
     FMode: TQueryMode;
   end;
 
@@ -48,9 +43,8 @@ implementation
 
 { TEditForm }
 
-procedure TEditForm.Prepare(ATable: TTableInfo; ADataSource: TDataSource;
-  ASQLQuery: TSQLQuery; AColumns: TDBGridColumns; AEditDSArr: TDataSourceArr;
-  AMode: TQueryMode);
+procedure TEditForm.Prepare(ATable: TTableInfo; ADataSource: TDataSource; ASQLQuery: TSQLQuery;
+  AColumns: TDBGridColumns; ARefDSArr: TDataSourceArr; AMode: TQueryMode);
 var
   Edit: TEdit;
   RFCounter, i: integer;
@@ -61,9 +55,8 @@ begin
   FMode := AMode;
   RFCounter := 0;
 
+  Height := Height + Length(FTable.Fields)*32;
   for i := 0 to high(FTable.Fields) do begin
-    self.Height := self.Height + 32;
-
     Edit := TEdit.Create(self);
     with Edit do begin
       Parent := self;
@@ -75,116 +68,99 @@ begin
       Text := ATable.Fields[i].Caption;
     end;
 
-    if ATable.Fields[i] is TRefFieldInfo then begin
-      SetLength(DBComboBoxArr, Length(DBComboBoxArr)+1);
-      DBComboBoxArr[high(DBComboBoxArr)] := TDBLookupComboBox.Create(self);
-      with DBComboBoxArr[high(DBComboBoxArr)] do begin
-        Parent := self;
-        width := 180;
-        Height := 27;
-        Left := 200;
-        Top := i*32+10;
-        ListSource := AEditDSArr[RFCounter];
-        ListField :=
-          GetCorrectFieldName((ATable.Fields[i] as TRefFieldInfo).FieldName);
-        KeyField :=
-          GetCorrectFieldName((ATable.Fields[i] as TRefFieldInfo).RefFieldName);
-        ItemIndex := 0;
-        ReadOnly := True;
-        if FMode = qmUpdate then begin
-          with (ATable.Fields[i] as TRefFieldInfo) do begin
-            TempQuery.SQL.Text :=
-              Format('SELECT %s FROM %s WHERE %s = ''%s''',
-                [RefFieldName, RefTableName, FieldName,
-                FSQLQuery.FieldByName(AColumns[i].FieldName).AsString]);
-            TempQuery.Open;
-            KeyValue := TempQuery.Fields[0].AsInteger;
-          end;
-          TempQuery.Close;
-        end;
-      end;
+    SetLength(DBEdits, Length(DBEdits)+1);
+    DBEdits[high(DBEdits)] :=
+      GetEditClass(ATable.Fields[i].DataType).Create(self, 200, i*32+10, 180, 27, nil);
+
+    if FTable.Fields[i] is TRefFieldInfo then begin
+      with DBEdits[high(DBEdits)] as TListEdit do
+        Prepare(ARefDSArr[RFCounter], ATable.Fields[i] as TRefFieldInfo);
       inc(RFCounter);
+      if FMode = qmUpdate then
+        DBEdits[high(DBEdits)].Value :=
+          FSQLQuery.FieldByName(ATable.Fields[i].Name).Value;
     end
     else begin
-      SetLength(DBEditArr, Length(DBEditArr)+1);
-      case ATable.Fields[i].DataType of
-      dtInt:
-        DBEditArr[high(DBEditArr)] :=
-          TTextEdit.Create(self, 200, i*32+10, 180, 27, nil);
-      dtStr:
-        DBEditArr[high(DBEditArr)] :=
-          TTextEdit.Create(self, 200, i*32+10, 180, 27, nil);
-      dtTIme:
-        DBEditArr[high(DBEditArr)] :=
-          TTimeEdit.Create(self, 200, i*32+10, 59, 27, nil);
-      end;
-
       if FMode = qmUpdate then
-        DBEditArr[high(DBEditArr)].Text :=
-          FSQLQuery.FieldByName(AColumns[i].FieldName).AsString;
+        DBEdits[high(DBEdits)].Value :=
+          FSQLQuery.FieldByName(AColumns[i].FieldName).Value;
     end;
   end;
   if FMode = qmInsert then begin
     TempQuery.SQL.Text :=
       Format('SELECT GEN_ID(%s, 0) FROM RDB$DATABASE', [FTable.Name+'_ID']);
     TempQuery.Open;
-    DBEditArr[0].Text := IntToStr(TempQuery.Fields[0].AsInteger+1);
+    DBEdits[0].Value := IntToStr(TempQuery.Fields[0].AsInteger+1);
     TempQuery.Close;
   end;
-  DBEditArr[0].Enabled := False; //защита от пользователя
+  DBEdits[0].Enabled := False;
 end;
 
 procedure TEditForm.OKButtonClick(Sender: TObject);
 var
-  tmpSQL, tmp1, tmp2: string;
-  FCounter, RFCounter, FieldID, i: integer;
+  SavedSQL, sqlAction, sqlParams: string;
+  FieldID, i: integer;
 begin
+  //with FSQLQuery do begin
+  //  case FMode of
+  //  qmInsert:
+  //    begin
+  //      Insert;
+  //      for i := 0 to high(FTable.Fields) do
+  //        FieldByName(FTable.Fields[i].Name).Value := DBEdits[i].Value;
+  //      Post;
+  //    end;
+  //  qmUpdate:
+  //    begin
+  //
+  //    end;
+  //  end;
+  //end;
+  for i := 0 to high(DBEdits) do
+    if DBEdits[i].Value = '' then begin
+      ShowMessage('Заполните все поля');
+      Show;
+      Exit;
+    end;
+
   with FSQLQuery do begin
+    FieldID := FieldByName('ID').Value;
     Close;
-    tmpSQL := SQL.Text;
+    SavedSQL := SQL.Text;
     SQL.Clear;
 
     case FMode of
     qmInsert:
       begin
+        sqlAction := '';
+        sqlParams := '';
         for i := 1 to high(FTable.Fields) do begin
-          tmp1 += FTable.Fields[i].Name + ',';
-          tmp2 += Format(':Value_%d,', [i]);
+          sqlAction += FTable.Fields[i].Name + ',';
+          sqlParams += Format(':Value_%d,', [i]);
         end;
-        tmp1[Length(tmp1)] := ')';
-        tmp2[Length(tmp2)] := ')';
-        SQL.Add(Format('INSERT INTO %s(%s', [FTable.Name, tmp1]));
-        SQL.Add(Format('VALUES(%s', [tmp2]));
+        sqlAction[Length(sqlAction)] := ')';
+        sqlParams[Length(sqlParams)] := ')';
+        SQL.Add(Format('INSERT INTO %s(%s', [FTable.Name, sqlAction]));
+        SQL.Add(Format('VALUES(%s', [sqlParams]));
       end;
     qmUpdate:
       begin
-        FieldID := FieldByName('ID').Value;
         SQL.Add(Format('UPDATE %s SET', [FTable.Name]));
 
         for i := 1 to high(FTable.Fields) do
-          tmp1 += Format('%s = :Value_%d,', [FTable.Fields[i].Name, i]);
+          sqlAction += Format('%s = :Value_%d,', [FTable.Fields[i].Name, i]);
 
-        System.Delete(tmp1, Length(tmp1), 1);
-        SQL.Add(tmp1);
+        System.Delete(sqlAction, Length(sqlAction), 1);
+        SQL.Add(sqlAction);
         SQL.Add(Format('WHERE ID = %d', [FieldID]));
       end;
     end;
 
-    FCounter := 1; //ID пропускаем
-    RFCounter := 0;
-    for i := 1 to high(FTable.Fields) do begin
-      if FTable.Fields[i] is TRefFieldInfo then begin
-        ParamByName(Format('Value_%d', [i])).Value := DBComboBoxArr[RFCounter].KeyValue;
-        inc(RFCounter);
-      end
-      else begin
-        ParamByName(Format('Value_%d', [i])).Value := DBEditArr[FCounter].Text;
-        inc(FCounter);
-      end;
-    end;
+    for i := 1 to high(FTable.Fields) do
+      ParamByName(Format('Value_%d', [i])).Value := DBEdits[i].Value;
 
     ExecSQL;
-    SQL.Text := tmpSQL;
+    SQL.Text := SavedSQL;
     Open;
     ApplyUpdates;
   end;
@@ -194,21 +170,6 @@ end;
 procedure TEditForm.CancelButtonClick(Sender: TObject);
 begin
   self.Close;
-end;
-
-procedure TEditForm.FOnKeyPress(Sender: TObject; var Key: char);
-begin
-  if (not (Key in ['0'..'9'])) and (Key <> #8) then Key := #0;
-end;
-
-function TEditForm.GetCorrectFieldName(const AFieldName: string): string;
-begin
-  Result := AFieldName;
-  if (Pos('"', Result) = 1) and (Result[Length(Result)] = '"') then
-  begin
-    Delete(Result, 1, 1);
-    Delete(Result, Length(Result), 1);
-  end;
 end;
 
 end.

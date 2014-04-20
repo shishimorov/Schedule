@@ -9,7 +9,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, main, reference_form, data, metadata, 
 search_frame, db_edit, search_filter_frame,
-  row_edit_form, confirm_form;
+  row_edit_form;
 
 {$R *.res}
 
@@ -19,7 +19,6 @@ begin
   Application.CreateForm(TMainForm, MainForm);
   //Application.CreateForm(TRefForm, RefForm);
   Application.CreateForm(TDBCon, DBCon);
-  Application.CreateForm(TConfirmForm, ConfirmForm);
   //Application.CreateForm(TEditForm, EditForm);
   Application.Run;
 end.

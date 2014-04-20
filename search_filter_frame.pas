@@ -15,7 +15,6 @@ type
   TParamQuery = record
     SQL: string;
     ParamName: string;
-    ParamType: TDataType;
     ParamValue: string;
   end;
 
@@ -31,7 +30,6 @@ type
     procedure CloseBtnClick(Sender: TObject);
     procedure CondBtnClick(Sender: TObject);
     procedure FieldBoxChange(Sender: TObject);
-    procedure FilterEditKeyPress(Sender: TObject; var Key: char);
   public
     procedure Prepare(ATable: TTableInfo);
   private
@@ -67,17 +65,13 @@ function TFilterFrame.GetParamQuery: TParamQuery;
 var FieldName: string;
 begin
   Result.SQL := '';
-  if FFilterEdit.Text = '' then Exit;
+  if FFilterEdit.Value = '' then Exit;
 
   FieldName := FTable.GetFullFieldName(FieldBox.ItemIndex);
   Result.ParamName := Format('FilterValue_%d', [Tag]);
-  Result.ParamValue := FFilterEdit.Text;
-  Result.ParamType := FTable.Fields[FieldBox.ItemIndex].DataType;
+  Result.ParamValue := FFilterEdit.Value;
 
   case FTable.Fields[FieldBox.ItemIndex].DataType of
-  dtInt, dtTime:
-    Result.SQL := Format('%s %s :%s',
-      [FieldName, OperBox.Items.Strings[OperBox.ItemIndex], Result.ParamName]);
   dtStr:
     case OperBox.ItemIndex of
     0:
@@ -88,8 +82,11 @@ begin
         Format('POSITION(UPPER(:%s), UPPER(%s)) = 1', [Result.ParamName, FieldName])
     else
       Result.SQL := Format('UPPER(%s) %s UPPER(:%s)',
-        [FieldName, OperBox.Items.Strings[OperBox.ItemIndex], Result.ParamName]);       ;
+        [FieldName, OperBox.Items.Strings[OperBox.ItemIndex], Result.ParamName]);
     end;
+  else
+    Result.SQL := Format('%s %s :%s',
+      [FieldName, OperBox.Items.Strings[OperBox.ItemIndex], Result.ParamName]);
   end;
 end;
 
@@ -120,17 +117,8 @@ end;
 procedure TFilterFrame.InitFilterEdit(ADataType: TDataType);
 begin
   FFilterEdit.Free;
-  case ADataType of
-  dtInt:
-    FFilterEdit :=
-      TTextEdit.Create(FilterBox, 2, 31, 265, 27, SearchQueryChange);
-  dtStr:
-    FFilterEdit :=
-      TTextEdit.Create(FilterBox, 2, 31, 265, 27, SearchQueryChange);
-  dtTime:
-    FFilterEdit :=
-      TTimeEdit.Create(FilterBox, 65, 31, 50, 27, SearchQueryChange);
-  end;
+  FFilterEdit :=
+    GetEditClass(ADataType).Create(FilterBox, 2, 31, 265, 27, SearchQueryChange);
 end;
 
 procedure TFilterFrame.FieldBoxChange(Sender: TObject);
@@ -138,11 +126,6 @@ begin
   InitOperBox(FTable.Fields[FieldBox.ItemIndex].DataType);
   InitFilterEdit(FTable.Fields[FieldBox.ItemIndex].DataType);
   SearchQueryChange(self);
-end;
-
-procedure TFilterFrame.FilterEditKeyPress(Sender: TObject; var Key: char);
-begin
-  if (not (Key in ['0'..'9'])) and (Key <> #8) then Key := #0;
 end;
 
 procedure TFilterFrame.CondBtnClick(Sender: TObject);
