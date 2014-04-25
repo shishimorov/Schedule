@@ -5,14 +5,15 @@ unit main;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  Menus, DbCtrls, EditBtn, reference_form, metadata, data, time_table_form;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
+  DbCtrls, EditBtn, StdCtrls, reference_form, metadata, data, time_table_form;
 
 type
 
   { TMainForm }
 
   TMainForm = class(TForm)
+    TimeTableBtn: TButton;
     MainMenu: TMainMenu;
     MTables: TMenuItem;
     MExit: TMenuItem;
@@ -21,6 +22,7 @@ type
     MAbout: TMenuItem;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure TimeTableBtnClick(Sender: TObject);
   private
     procedure MRefClick(Sender: TObject);
   private
@@ -53,6 +55,11 @@ begin
     end;
     MTables.Insert(i, MenuItem);
   end;
+end;
+
+procedure TMainForm.TimeTableBtnClick(Sender: TObject);
+begin
+  TimeTable.Free;
   TimeTable := TTimeTable.Create(self);
   TimeTable.Show;
 end;

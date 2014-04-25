@@ -1,16 +1,27 @@
 object MainForm: TMainForm
-  Left = 600
-  Height = 706
-  Top = 156
-  Width = 678
+  Left = 268
+  Height = 123
+  Top = 243
+  Width = 483
   Caption = 'MainForm'
+  ClientHeight = 123
+  ClientWidth = 483
   Menu = MainMenu
   OnClose = FormClose
   OnCreate = FormCreate
   LCLVersion = '1.2.0.3'
+  object TimeTableBtn: TButton
+    Left = 160
+    Height = 57
+    Top = 24
+    Width = 136
+    Caption = 'Расписание'
+    OnClick = TimeTableBtnClick
+    TabOrder = 0
+  end
   object MainMenu: TMainMenu
-    left = 320
-    top = 232
+    left = 376
+    top = 40
     object MFile: TMenuItem
       Caption = 'Файл'
       object MExit: TMenuItem
