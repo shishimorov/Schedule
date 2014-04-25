@@ -149,7 +149,7 @@ begin
   FTable := ATable;
   Caption := FTable.Caption;
   SQLQuery.SQL := FTable.SQL;
-  ShowMessage(SQLQuery.SQL.Text);
+  //ShowMessage(SQLQuery.SQL.Text);
   FSortedColInd := -1;
   for i := 0 to high(FTable.Fields) do begin
     DBGrid.Columns.Add;

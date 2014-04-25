@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, db, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs,
-  Grids, ExtCtrls, StdCtrls, Menus, search_frame, search_filter_frame,
+  Grids, ExtCtrls, StdCtrls, Menus, Buttons, search_frame, search_filter_frame,
   metadata, data, math;
 
 type
@@ -16,6 +16,8 @@ type
   TIntArray = array of integer;
 
   TTimeTable = class(TForm)
+    AddFilterBtn: TSpeedButton;
+    FiltersBox: TGroupBox;
     ShowFieldNames: TCheckBox;
     CheckFields: TCheckGroup;
     DrawGrid: TDrawGrid;
@@ -28,6 +30,8 @@ type
     Vertical: TLabel;
     TopPanel: TPanel;
     FilterPanel: TPanel;
+    procedure AddFilterBtnClick(Sender: TObject);
+    procedure CloseFilterClick(AFilterIndex: integer);
     procedure DrawGridDrawCell(Sender: TObject; aCol, aRow: Integer;
       aRect: TRect; aState: TGridDrawState);
     procedure FormCreate(Sender: TObject);
@@ -46,6 +50,7 @@ type
     FHFIDArray, FVFIDArray: TIntArray;
     FCurHFI, FCurVFI: integer;
     FTable, FMDTable: TTableInfo;
+    FFilters: TFilters;
     FRowHeight, FTextHeight: integer;
   const
     FieldSelectionError: string = 'Поле по горизонтали совпадает с полем по вертикали';
@@ -122,6 +127,7 @@ begin
       SQLQuery.SQL.Strings[WHERE_IND] := Format('WHERE %s = %d and %s = %d',
         [FTable.Fields[FCurHFI].Name, FHFIDArray[i-1],
          FTable.Fields[FCurVFI].Name, FVFIDArray[j-1]]);
+      GetFiltersSQL(FFilters, SQLQuery);
       //ShowMessage(SQLQuery.SQL.Text);
       SQLQuery.Open;
       while not SQLQuery.EOF do begin
@@ -240,6 +246,24 @@ begin
     end;
     SetLength(FCellData[i], 0);
   end;
+end;
+
+procedure TTimeTable.AddFilterBtnClick(Sender: TObject);
+var tmp: TFilterFrame;
+begin
+  tmp := AddFilter(FiltersBox, FFilters);
+  if tmp <> nil then
+    with tmp do begin
+      CloseFilter := @CloseFilterClick;
+      Prepare(self.FMDTable);
+      FiltersBox.Height := FiltersBox.Height+Height;
+    end;
+end;
+
+procedure TTimeTable.CloseFilterClick(AFilterIndex: integer);
+begin
+  FiltersBox.Height := FiltersBox.Height-FFilters[AFilterIndex].Height;
+  CloseFilter(FiltersBox, FFilters, AFilterIndex);
 end;
 
 end.

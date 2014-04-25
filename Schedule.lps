@@ -20,10 +20,11 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="main"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="27"/>
-        <CursorPos X="1" Y="56"/>
+        <TopLine Value="35"/>
+        <CursorPos X="7" Y="57"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -35,10 +36,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="reference_form"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="5"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="163"/>
-        <CursorPos X="44" Y="163"/>
+        <TopLine Value="148"/>
+        <CursorPos X="5" Y="152"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -62,7 +63,7 @@
         <Filename Value="metadata.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="metadata"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="4"/>
         <WindowIndex Value="0"/>
         <TopLine Value="19"/>
         <CursorPos X="48" Y="62"/>
@@ -76,22 +77,23 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="search_frame"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="27" Y="186"/>
-        <UsageCount Value="175"/>
+        <TopLine Value="77"/>
+        <CursorPos X="38" Y="122"/>
+        <UsageCount Value="179"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="db_edit.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="db_edit"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="6"/>
         <WindowIndex Value="0"/>
         <TopLine Value="191"/>
         <CursorPos X="40" Y="242"/>
-        <UsageCount Value="174"/>
+        <UsageCount Value="178"/>
         <Loaded Value="True"/>
       </Unit6>
       <Unit7>
@@ -101,11 +103,11 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="search_filter_frame"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="103"/>
-        <CursorPos X="12" Y="42"/>
-        <UsageCount Value="167"/>
+        <TopLine Value="97"/>
+        <CursorPos X="52" Y="32"/>
+        <UsageCount Value="171"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit7>
@@ -120,7 +122,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="67"/>
         <CursorPos X="16" Y="118"/>
-        <UsageCount Value="140"/>
+        <UsageCount Value="144"/>
         <Loaded Value="True"/>
       </Unit8>
       <Unit9>
@@ -130,12 +132,11 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="time_table_form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="194"/>
-        <CursorPos X="3" Y="10"/>
-        <UsageCount Value="71"/>
+        <TopLine Value="218"/>
+        <CursorPos X="64" Y="233"/>
+        <UsageCount Value="75"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit9>
@@ -388,9 +389,9 @@
       <Unit41>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/control.inc"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="3171"/>
-        <CursorPos X="3" Y="3176"/>
-        <UsageCount Value="6"/>
+        <TopLine Value="3141"/>
+        <CursorPos X="1" Y="3167"/>
+        <UsageCount Value="10"/>
       </Unit41>
       <Unit42>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/fpimagebitmap.inc"/>
@@ -418,9 +419,9 @@
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/controls.pp"/>
         <UnitName Value="Controls"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="2050"/>
-        <CursorPos X="15" Y="2076"/>
-        <UsageCount Value="6"/>
+        <TopLine Value="1603"/>
+        <CursorPos X="14" Y="1630"/>
+        <UsageCount Value="10"/>
       </Unit45>
       <Unit46>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/lclclasses.pp"/>
@@ -635,124 +636,124 @@
     </General>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="135" Column="29" TopLine="91"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="12" Column="23" TopLine="1"/>
       </Position1>
       <Position2>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="87" Column="7" TopLine="40"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="232" Column="59" TopLine="202"/>
       </Position2>
       <Position3>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="77" Column="19" TopLine="59"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="240" Column="27" TopLine="154"/>
       </Position3>
       <Position4>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="86" Column="50" TopLine="60"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="175" Column="7" TopLine="163"/>
       </Position4>
       <Position5>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="87" Column="54" TopLine="55"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="170" Column="28" TopLine="162"/>
       </Position5>
       <Position6>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="88" Column="72" TopLine="47"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="232" Column="39" TopLine="191"/>
       </Position6>
       <Position7>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="95" Column="72" TopLine="62"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="179" Column="5" TopLine="161"/>
       </Position7>
       <Position8>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="146" Column="9" TopLine="115"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="229" Column="48" TopLine="86"/>
       </Position8>
       <Position9>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="43" Column="31" TopLine="10"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="50" Column="89" TopLine="1"/>
       </Position9>
       <Position10>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="44" Column="31" TopLine="10"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="181" Column="36" TopLine="155"/>
       </Position10>
       <Position11>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="45" Column="31" TopLine="10"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="209" Column="4" TopLine="173"/>
       </Position11>
       <Position12>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="46" Column="31" TopLine="10"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="205" Column="16" TopLine="173"/>
       </Position12>
       <Position13>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="171" Column="65" TopLine="205"/>
+        <Caret Line="49" Column="38" TopLine="112"/>
       </Position13>
       <Position14>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="49" Column="39" TopLine="67"/>
+        <Caret Line="50" Column="38" TopLine="50"/>
       </Position14>
       <Position15>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="226" Column="3" TopLine="166"/>
+        <Caret Line="52" Column="38" TopLine="52"/>
       </Position15>
       <Position16>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="140" Column="54" TopLine="116"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="166" Column="1" TopLine="159"/>
       </Position16>
       <Position17>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="123" Column="47" TopLine="97"/>
+        <Caret Line="34" Column="55" TopLine="188"/>
       </Position17>
       <Position18>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="42" Column="45" TopLine="7"/>
+        <Caret Line="123" Column="51" TopLine="102"/>
       </Position18>
       <Position19>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="132" Column="32" TopLine="107"/>
+        <Caret Line="120" Column="22" TopLine="94"/>
       </Position19>
       <Position20>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="131" Column="32" TopLine="106"/>
+        <Filename Value="search_filter_frame.pas"/>
+        <Caret Line="145" Column="61" TopLine="103"/>
       </Position20>
       <Position21>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="130" Column="32" TopLine="105"/>
+        <Caret Line="262" Column="58" TopLine="233"/>
       </Position21>
       <Position22>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="129" Column="32" TopLine="104"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="252" Column="19" TopLine="204"/>
       </Position22>
       <Position23>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="128" Column="32" TopLine="103"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="232" Column="40" TopLine="204"/>
       </Position23>
       <Position24>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="58" Column="69" TopLine="94"/>
+        <Filename Value="search_frame.pas"/>
+        <Caret Line="252" Column="14" TopLine="204"/>
       </Position24>
       <Position25>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="91" Column="41" TopLine="70"/>
+        <Caret Line="45" Column="61" TopLine="16"/>
       </Position25>
       <Position26>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="95" Column="22" TopLine="65"/>
+        <Caret Line="130" Column="20" TopLine="104"/>
       </Position26>
       <Position27>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="97" Column="58" TopLine="61"/>
+        <Caret Line="131" Column="9" TopLine="117"/>
       </Position27>
       <Position28>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="93" Column="71" TopLine="80"/>
+        <Filename Value="main.pas"/>
+        <Caret Line="57" Column="1" TopLine="29"/>
       </Position28>
       <Position29>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="90" Column="1" TopLine="117"/>
+        <Filename Value="main.pas"/>
+        <Caret Line="23" Column="43" TopLine="5"/>
       </Position29>
       <Position30>
-        <Filename Value="time_table_form.pas"/>
-        <Caret Line="155" Column="18" TopLine="121"/>
+        <Filename Value="main.pas"/>
+        <Caret Line="25" Column="50" TopLine="5"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>
