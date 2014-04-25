@@ -224,11 +224,4 @@ object SearchFrame: TSearchFrame
       OnClick = AddFilterBtnClick
     end
   end
-  object MoveFilterTimer: TTimer
-    Enabled = False
-    Interval = 1
-    OnTimer = MoveFilterTimerTimer
-    left = 176
-    top = 112
-  end
 end

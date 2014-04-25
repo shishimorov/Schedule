@@ -125,7 +125,7 @@ procedure TFilterFrame.FieldBoxChange(Sender: TObject);
 begin
   InitOperBox(FTable.Fields[FieldBox.ItemIndex].DataType);
   InitFilterEdit(FTable.Fields[FieldBox.ItemIndex].DataType);
-  SearchQueryChange(self);
+  if SearchQueryChange <> nil then SearchQueryChange(self);
 end;
 
 procedure TFilterFrame.CondBtnClick(Sender: TObject);
@@ -142,7 +142,7 @@ begin
       CondBtn.Caption := 'И';
     end;
   end;
-  SearchQueryChange(self);
+  if SearchQueryChange <> nil then SearchQueryChange(self);
 end;
 
 procedure TFilterFrame.CloseBtnClick(Sender: TObject);

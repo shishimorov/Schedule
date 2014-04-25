@@ -8,9 +8,14 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, StdCtrls, Buttons, sqldb,
   search_filter_frame, db_edit, metadata, dialogs, ExtCtrls;
 
+const
+  FILTER_LIMIT = 10;
+
 type
 
   { TSearchFrame }
+
+  TFilters = array of TFilterFrame;
 
   TSearchFrame = class(TFrame)
     ApplyFilters: TCheckBox;
@@ -18,9 +23,7 @@ type
     FiltersBox: TGroupBox;
     SearchBox: TGroupBox;
     AddFilterBtn: TSpeedButton;
-    MoveFilterTimer: TTimer;
     procedure AddFilterBtnClick(Sender: TObject);
-    procedure MoveFilterTimerTimer(Sender: TObject);
     procedure SearchQueryChange(Sender: TObject);
     procedure FieldBoxChange(Sender: TObject);
     procedure SearchBtnClick(Sender: TObject);
@@ -37,11 +40,13 @@ type
     FSQLQuery: TSQLQuery;
     FSearchEdit: TDBEditWBH;
     FSearchBtn: TSpeedButton;
-    FFilters: array of TFilterFrame;
+    FFilters: TFilters;
     FClosedFilterIndex, FFinalHeight: integer;
-  const
-    FILTER_LIMIT = 10;
   end;
+
+function AddFilter(TheOwner: TGroupBox; var AFilters: TFilters): TFilterFrame;
+procedure CloseFilter(TheOwner: TGroupBox; var AFilters: TFilters; AFilterIndex: integer);
+procedure GetFiltersSQL(AFilters: TFilters; ASQLQuery: TSQLQuery);
 
 implementation
 
@@ -113,28 +118,8 @@ begin
   end
   else FSQLQuery.SQL.Strings[WHERE_IND] := '';
 
-  if ApplyFilters.Checked then begin
-    Cond := 'AND ('; //связка поиска с фильтрами
-    for i := 0 to high(FFilters) do begin
-      if FFilters[i].ApplyFilter.Checked then begin
-        ParamQuery := FFilters[i].ParamQuery;
-        if ParamQuery.SQL <> '' then begin
-          if FSQLQuery.SQL.Strings[WHERE_IND] = '' then
-            FSQLQuery.SQL.Strings[WHERE_IND] := Format('WHERE (%s', [ParamQuery.SQL])
-          else
-            FSQLQuery.SQL.Strings[WHERE_IND] := Format('%s %s %s',
-              [FSQLQuery.SQL.Strings[WHERE_IND], Cond, ParamQuery.SQL]);
-          case FFilters[i].CondBtn.Tag of
-          0: Cond := 'AND';
-          1: Cond := 'OR';
-          end;
-          FSQLQuery.ParamByName(ParamQuery.ParamName).Value := ParamQuery.ParamValue
-        end;
-      end;
-    end;
-    if Length(Cond) <> 5 then
-      FSQLQuery.SQL.Strings[WHERE_IND] := FSQLQuery.SQL.Strings[WHERE_IND] + ')';
-  end;
+  if ApplyFilters.Checked then
+    GetFiltersSQL(FFilters, FSQLQuery);
 
   FSQLQuery.Open;
 end;
@@ -159,60 +144,91 @@ begin
 end;
 
 procedure TSearchFrame.AddFilterBtnClick(Sender: TObject);
+var tmp: TFilterFrame;
 begin
-  if Length(FFilters) >= FILTER_LIMIT then Exit;
-  if Length(FFilters) > 0 then
-    FFilters[high(FFilters)].CondBtn.Visible := True;
-  SetLength(FFilters, Length(FFilters) + 1);
-  FFilters[high(FFilters)] := TFilterFrame.Create(FiltersBox);
-  with FFilters[high(FFilters)] do begin
-    Tag := Length(FFilters);
-    Top := high(FFilters) * Height;
-    Name := Format('FilterFrame_%d', [Tag]);
-    //FilterBox.Caption := Format('Фильтр %d', [Tag]);
-    SearchQueryChange := @self.SearchQueryChange;
-    CloseFilter := @CloseFilterClick;
-    Prepare(self.FTable);
-  end;
-  Height := Height + FFilters[high(FFilters)].Height;
-  FiltersBox.InsertControl(FFilters[high(FFilters)]);
+  tmp := AddFilter(FiltersBox, FFilters);
+  if tmp <> nil then
+    with tmp do begin
+      SearchQueryChange := @self.SearchQueryChange;
+      CloseFilter := @CloseFilterClick;
+      Prepare(self.FTable);
+      self.Height := self.Height+Height;
+    end;
 end;
 
 procedure TSearchFrame.CloseFilterClick(AFilterIndex: integer);
 var i: integer;
 begin
-  if MoveFilterTimer.Enabled then Exit;
-  FClosedFilterIndex := AFilterIndex;
-  FFinalHeight := Height - FFilters[AFilterIndex].Height;
-  FiltersBox.RemoveControl(FFilters[AFilterIndex]);
-  FFilters[AFilterIndex].Free;
+  Height := Height-FFilters[AFilterIndex].Height;
+  CloseFilter(FiltersBox, FFilters, AFilterIndex);
+  SearchQueryChange(self);
+end;
 
-  for i := AFilterIndex to high(FFilters) - 1 do begin
-    FFilters[i] := FFilters[i+1];
-    with FFilters[i] do begin
-      Tag := FFilters[i].Tag - 1;
+function AddFilter(TheOwner: TGroupBox; var AFilters: TFilters): TFilterFrame;
+begin
+  Result := nil;
+  if Length(AFilters) >= FILTER_LIMIT then Exit;
+  if Length(AFilters) > 0 then
+    AFilters[high(AFilters)].CondBtn.Visible := True;
+  SetLength(AFilters, Length(AFilters) + 1);
+  AFilters[high(AFilters)] := TFilterFrame.Create(TheOwner);
+  with AFilters[high(AFilters)] do begin
+    Tag := Length(AFilters);
+    Top := high(AFilters)*Height;
+    Name := Format('FilterFrame_%d', [Tag]);
+    //FilterBox.Caption := Format('Фильтр %d', [Tag]);
+  end;
+  TheOwner.InsertControl(AFilters[high(AFilters)]);
+  Result := AFilters[high(AFilters)];
+end;
+
+procedure CloseFilter(TheOwner: TGroupBox; var AFilters: TFilters; AFilterIndex: integer);
+var i: integer;
+begin
+  TheOwner.RemoveControl(AFilters[AFilterIndex]);
+  AFilters[AFilterIndex].Free;
+
+  for i := AFilterIndex to high(AFilters) - 1 do begin
+    AFilters[i] := AFilters[i+1];
+    with AFilters[i] do begin
+      Tag := AFilters[i].Tag - 1;
+      Top := Top - Height;
       //Caption := Format('Фильтр %d', [Tag]);
       Name := Format('FilterFrame_%d', [Tag]);
       //FilterBox.Caption := Caption;
     end;
   end;
-  SetLength(FFilters, Length(FFilters) - 1);
-  if Length(FFilters) > 0 then
-    FFilters[high(FFilters)].CondBtn.Visible := False;
-  MoveFilterTimer.Enabled := True;
-  SearchQueryChange(self);
+  SetLength(AFilters, Length(AFilters) - 1);
+  if Length(AFilters) > 0 then
+    AFilters[high(AFilters)].CondBtn.Visible := False;
 end;
 
-procedure TSearchFrame.MoveFilterTimerTimer(Sender: TObject);
-var i: integer;
+procedure GetFiltersSQL(AFilters: TFilters; ASQLQuery: TSQLQuery);
+var
+  i: integer;
+  Cond: string;
+  ParamQuery: TParamQuery;
 begin
-  if Height = FFinalHeight then begin
-    MoveFilterTimer.Enabled := False;
-    Exit;
+  Cond := 'AND (';
+  for i := 0 to high(AFilters) do begin
+    if AFilters[i].ApplyFilter.Checked then begin
+      ParamQuery := AFilters[i].ParamQuery;
+      if ParamQuery.SQL <> '' then begin
+        if ASQLQuery.SQL.Strings[WHERE_IND] = '' then
+          ASQLQuery.SQL.Strings[WHERE_IND] := Format('WHERE (%s', [ParamQuery.SQL])
+        else
+          ASQLQuery.SQL.Strings[WHERE_IND] := Format('%s %s %s',
+            [ASQLQuery.SQL.Strings[WHERE_IND], Cond, ParamQuery.SQL]);
+        case AFilters[i].CondBtn.Tag of
+        0: Cond := 'AND';
+        1: Cond := 'OR';
+        end;
+        ASQLQuery.ParamByName(ParamQuery.ParamName).Value := ParamQuery.ParamValue
+      end;
+    end;
   end;
-  Height := Height - 2;
-  for i := FClosedFilterIndex to high(FFilters) do
-    FFilters[i].Top := FFilters[i].Top - 2;
+  if Length(Cond) <> 5 then
+    ASQLQuery.SQL.Strings[WHERE_IND] := ASQLQuery.SQL.Strings[WHERE_IND] + ')';
 end;
 
 end.
