@@ -4,9 +4,8 @@ object RefForm: TRefForm
   Top = 112
   Width = 1372
   HorzScrollBar.Page = 1372
-  HorzScrollBar.Range = 1230
   VertScrollBar.Page = 777
-  VertScrollBar.Range = 76
+  AutoScroll = True
   Caption = 'TableName'
   ClientHeight = 777
   ClientWidth = 1372
@@ -124,8 +123,8 @@ object RefForm: TRefForm
   end
   object SQLQuery: TSQLQuery
     FieldDefs = <>
-    Database = DBCon.IBConnection
-    Transaction = DBCon.SQLTransaction
+    Database = DBData.IBConnection
+    Transaction = DBData.SQLTransaction
     Params = <>
     left = 168
     top = 176

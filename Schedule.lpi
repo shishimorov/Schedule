@@ -40,7 +40,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="9">
+    <Units Count="10">
       <Unit0>
         <Filename Value="Schedule.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -65,7 +65,7 @@
       <Unit3>
         <Filename Value="data.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="DBCon"/>
+        <ComponentName Value="DBData"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
         <UnitName Value="data"/>
@@ -104,6 +104,14 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="row_edit_form"/>
       </Unit8>
+      <Unit9>
+        <Filename Value="time_table_form.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="TimeTable"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="time_table_form"/>
+      </Unit9>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

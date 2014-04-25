@@ -200,6 +200,7 @@ begin
   if Length(FFilters) > 0 then
     FFilters[high(FFilters)].CondBtn.Visible := False;
   MoveFilterTimer.Enabled := True;
+  SearchQueryChange(self);
 end;
 
 procedure TSearchFrame.MoveFilterTimerTimer(Sender: TObject);

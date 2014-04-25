@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  Menus, DbCtrls, EditBtn, reference_form, metadata, data;
+  Menus, DbCtrls, EditBtn, reference_form, metadata, data, time_table_form;
 
 type
 
@@ -53,6 +53,8 @@ begin
     end;
     MTables.Insert(i, MenuItem);
   end;
+  TimeTable := TTimeTable.Create(self);
+  TimeTable.Show;
 end;
 
 procedure TMainForm.MRefClick(Sender: TObject);

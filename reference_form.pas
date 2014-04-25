@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, db, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs,
   Grids, DBGrids, DbCtrls, ActnList, Menus, ExtCtrls, Buttons, EditBtn,
-  metadata, search_frame, row_edit_form, data, confirm_form;
+  metadata, search_frame, row_edit_form, data;
 
 type
 
@@ -36,7 +36,6 @@ type
     procedure InitSearchFrame;
   private
     procedure RemoveInvalidPointers(var AObjects: TEditForms);
-    function GetColumnName(const AFieldName: string): string;
   private
     FEditForms: TEditForms;
     FRefQueryArr: array of TSQLQuery;
@@ -47,7 +46,6 @@ type
   const
     CleanFrequency = 2;
     MB_YES = 6;
-    MB_NO = 7;
     MB_YESNO = 4;
     MB_ICONWARNING = 48;
   end;
@@ -124,6 +122,7 @@ begin
       Exit;
     end;
   SetLength(FEditForms, Length(FEditForms)+1);
+  FEditForms[high(FEditForms)] := nil;
   FEditForms[high(FEditForms)] := TEditForm.Create(self);
   with FEditForms[high(FEditForms)] do begin
     Prepare(FTable, DataSource, SQLQuery, DBGrid.Columns, FRefDSArr, qmUpdate);
@@ -150,6 +149,7 @@ begin
   FTable := ATable;
   Caption := FTable.Caption;
   SQLQuery.SQL := FTable.SQL;
+  ShowMessage(SQLQuery.SQL.Text);
   FSortedColInd := -1;
   for i := 0 to high(FTable.Fields) do begin
     DBGrid.Columns.Add;
@@ -160,15 +160,15 @@ begin
       Title.Caption := FTable.Fields[i].Caption;
       //Visible := FTable.Fields[i].Visible;
       //Width := FTable.Fields[i].Width;
-      FieldName := GetColumnName(FTable.Fields[i].GetFieldName);
+      FieldName := FTable.GetColumnName(i);
     end;
 
     if FTable.Fields[i] is TRefFieldInfo then begin
       SetLength(FRefQueryArr, Length(FRefQueryArr)+1);
       FRefQueryArr[high(FRefQueryArr)] := TSQLQuery.Create(self);
       with FRefQueryArr[high(FRefQueryArr)] do begin
-        DataBase := DBCon.IBConnection;
-        Transaction := DBCon.SQLTransaction;
+        DataBase := DBData.IBConnection;
+        Transaction := DBData.SQLTransaction;
         SQL.Text := Format('SELECT t.%s, t.%s FROM %s t',
           [(FTable.Fields[i] as TRefFieldInfo).KeyFieldName,
           (FTable.Fields[i] as TRefFieldInfo).ListFieldName,
@@ -200,8 +200,9 @@ var i, j, k: integer;
 begin
   j := -1;
   k := 0;
+  //ShowMessage(IntToStr(Length(AObjects)));
   for i := 0 to high(AObjects) do
-    if Assigned(AObjects[i]) then begin
+    if not Assigned(AObjects[i]) then begin
       j := i;
       inc(k);
     end
@@ -212,17 +213,7 @@ begin
         j := -1;
       end;
   SetLength(AObjects, Length(AObjects)-k);
-end;
-
-function TRefForm.GetColumnName(const AFieldName: string): string;
-var i, j: integer;
-begin
-  Result := AnsiDequotedStr(AFieldName, '"');
-  j := 0;
-  for i := 0 to DBGrid.Columns.Count - 1 do
-    if Pos(Result, DBGrid.Columns[i].FieldName) > 0 then inc(j);
-  if j > 0 then
-    Result := Format('%s_%d', [Result, j]);
+  //ShowMessage(IntToStr(Length(AObjects)));
 end;
 
 end.

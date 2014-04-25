@@ -69,10 +69,8 @@ begin
     end;
 
     SetLength(DBEdits, Length(DBEdits)+1);
-    DBEdits[high(DBEdits)] :=
-      GetEditClass(ATable.Fields[i].DataType).Create(self, 200, i*32+10, 180, 27, nil);
-
     if FTable.Fields[i] is TRefFieldInfo then begin
+      DBEdits[high(DBEdits)] := TListEdit.Create(self, 200, i*32+10, 180, 27, nil);
       with DBEdits[high(DBEdits)] as TListEdit do
         Prepare(ARefDSArr[RFCounter], ATable.Fields[i] as TRefFieldInfo);
       inc(RFCounter);
@@ -81,6 +79,8 @@ begin
           FSQLQuery.FieldByName(ATable.Fields[i].Name).Value;
     end
     else begin
+      DBEdits[high(DBEdits)] :=
+        GetEditClass(ATable.Fields[i].DataType).Create(self, 200, i*32+10, 180, 27, nil);
       if FMode = qmUpdate then
         DBEdits[high(DBEdits)].Value :=
           FSQLQuery.FieldByName(AColumns[i].FieldName).Value;

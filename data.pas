@@ -9,9 +9,9 @@ uses
 
 type
 
-  { TDBCon }
+  { TDBData }
 
-  TDBCon = class(TDataModule)
+  TDBData = class(TDataModule)
     IBConnection: TIBConnection;
     SQLTransaction: TSQLTransaction;
   private
@@ -21,13 +21,13 @@ type
   end;
 
 var
-  DBCon: TDBCon;
+  DBData: TDBData;
 
 implementation
 
 {$R *.lfm}
 
-{ TDBCon }
+{ TDBData }
 
 end.
 

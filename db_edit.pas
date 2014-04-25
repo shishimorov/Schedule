@@ -218,6 +218,7 @@ begin
     Width := AWidth;
     Height := AHeight;
     OnChange := AOnChange;
+    ReadOnly := True;
   end;
 end;
 
@@ -237,7 +238,8 @@ end;
 
 function TListEdit.GetValue: Variant;
 begin
-  Result := FEdit.KeyValue;
+  if FEdit.KeyValue = Null then Result := ''
+  else Result := String(FEdit.KeyValue);
 end;
 
 procedure TListEdit.SetValue(AValue: Variant);

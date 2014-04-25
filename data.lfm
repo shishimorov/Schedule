@@ -1,4 +1,4 @@
-object DBCon: TDBCon
+object DBData: TDBData
   OldCreateOrder = False
   Height = 210
   HorizontalOffset = 455
