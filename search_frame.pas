@@ -29,7 +29,8 @@ type
     procedure SearchBtnClick(Sender: TObject);
     procedure CloseFilterClick(AFilterIndex: integer);
   public
-    procedure Prepare(ATable: TTableInfo; ASQLQuery: TSQLQuery);
+    constructor Create(TheOwner: TComponent; ATable: TTableInfo;
+      ASQLQuery: TSQLQuery); overload;
   private
     procedure InitFieldBox;
     procedure InitSearchEdit(ADataType: TDataType);
@@ -41,10 +42,9 @@ type
     FSearchEdit: TDBEditWBH;
     FSearchBtn: TSpeedButton;
     FFilters: TFilters;
-    FClosedFilterIndex, FFinalHeight: integer;
   end;
 
-function AddFilter(TheOwner: TGroupBox; var AFilters: TFilters): TFilterFrame;
+function AddFilter(TheOwner: TGroupBox; var AFilters: TFilters; ATable: TTableInfo): TFilterFrame;
 procedure CloseFilter(TheOwner: TGroupBox; var AFilters: TFilters; AFilterIndex: integer);
 procedure GetFiltersSQL(AFilters: TFilters; ASQLQuery: TSQLQuery);
 
@@ -52,8 +52,10 @@ implementation
 
 {$R *.lfm}
 
-procedure TSearchFrame.Prepare(ATable: TTableInfo; ASQLQuery: TSQLQuery);
+constructor TSearchFrame.Create(TheOwner: TComponent; ATable: TTableInfo;
+  ASQLQuery: TSQLQuery);
 begin
+  inherited Create(TheOwner);
   FTable := ATable;
   FSQLQuery := ASQLQuery;
   InitFieldBox;
@@ -93,9 +95,7 @@ end;
 
 procedure TSearchFrame.UpdateTable;
 var
-  FieldName, Cond: string;
-  ParamQuery: TParamQuery;
-  i: integer;
+  FieldName: string;
 begin
   FSQLQuery.Close;
   FieldName := FTable.GetFullFieldName(FieldBox.ItemIndex);
@@ -144,39 +144,36 @@ begin
 end;
 
 procedure TSearchFrame.AddFilterBtnClick(Sender: TObject);
-var tmp: TFilterFrame;
+var NewFilter: TFilterFrame;
 begin
-  tmp := AddFilter(FiltersBox, FFilters);
-  if tmp <> nil then
-    with tmp do begin
+  NewFilter := AddFilter(FiltersBox, FFilters, FTable);
+  if NewFilter <> nil then
+    with NewFilter do begin
       SearchQueryChange := @self.SearchQueryChange;
       CloseFilter := @CloseFilterClick;
-      Prepare(self.FTable);
       self.Height := self.Height+Height;
     end;
 end;
 
 procedure TSearchFrame.CloseFilterClick(AFilterIndex: integer);
-var i: integer;
 begin
   Height := Height-FFilters[AFilterIndex].Height;
   CloseFilter(FiltersBox, FFilters, AFilterIndex);
   SearchQueryChange(self);
 end;
 
-function AddFilter(TheOwner: TGroupBox; var AFilters: TFilters): TFilterFrame;
+function AddFilter(TheOwner: TGroupBox; var AFilters: TFilters; ATable: TTableInfo): TFilterFrame;
 begin
   Result := nil;
   if Length(AFilters) >= FILTER_LIMIT then Exit;
   if Length(AFilters) > 0 then
     AFilters[high(AFilters)].CondBtn.Visible := True;
   SetLength(AFilters, Length(AFilters) + 1);
-  AFilters[high(AFilters)] := TFilterFrame.Create(TheOwner);
+  AFilters[high(AFilters)] := TFilterFrame.Create(TheOwner, ATable);
   with AFilters[high(AFilters)] do begin
     Tag := Length(AFilters);
     Top := high(AFilters)*Height;
     Name := Format('FilterFrame_%d', [Tag]);
-    //FilterBox.Caption := Format('Фильтр %d', [Tag]);
   end;
   TheOwner.InsertControl(AFilters[high(AFilters)]);
   Result := AFilters[high(AFilters)];
@@ -193,9 +190,7 @@ begin
     with AFilters[i] do begin
       Tag := AFilters[i].Tag - 1;
       Top := Top - Height;
-      //Caption := Format('Фильтр %d', [Tag]);
       Name := Format('FilterFrame_%d', [Tag]);
-      //FilterBox.Caption := Caption;
     end;
   end;
   SetLength(AFilters, Length(AFilters) - 1);

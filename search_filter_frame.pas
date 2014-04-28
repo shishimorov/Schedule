@@ -31,7 +31,7 @@ type
     procedure CondBtnClick(Sender: TObject);
     procedure FieldBoxChange(Sender: TObject);
   public
-    procedure Prepare(ATable: TTableInfo);
+    constructor Create(TheOwner: TComponent; ATable: TTableInfo); overload;
   private
     procedure InitFieldBox;
     procedure InitOperBox(ADataType: TDataType);
@@ -51,8 +51,9 @@ implementation
 
 {$R *.lfm}
 
-procedure TFilterFrame.Prepare(ATable: TTableInfo);
+constructor TFilterFrame.Create(TheOwner: TComponent; ATable: TTableInfo); overload;
 begin
+  inherited Create(TheOwner);
   FTable := ATable;
   InitFieldBox;
   InitOperBox(FTable.Fields[FieldBox.ItemIndex].DataType);

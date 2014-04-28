@@ -249,13 +249,12 @@ begin
 end;
 
 procedure TTimeTable.AddFilterBtnClick(Sender: TObject);
-var tmp: TFilterFrame;
+var NewFilter: TFilterFrame;
 begin
-  tmp := AddFilter(FiltersBox, FFilters);
-  if tmp <> nil then
-    with tmp do begin
+  NewFilter := AddFilter(FiltersBox, FFilters, FMDTable);
+  if NewFilter <> nil then
+    with NewFilter do begin
       CloseFilter := @CloseFilterClick;
-      Prepare(self.FMDTable);
       FiltersBox.Height := FiltersBox.Height+Height;
     end;
 end;

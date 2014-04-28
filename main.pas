@@ -66,16 +66,10 @@ end;
 
 procedure TMainForm.MRefClick(Sender: TObject);
 begin
-  if FReferences[(Sender as TMenuItem).Tag] = nil then begin
-    FReferences[(Sender as TMenuItem).Tag] := TRefForm.Create(self);
-    with FReferences[(Sender as TMenuItem).Tag] do begin
-      Show;
-      PrepareDBGrid(MData.Tables[(Sender as TMenuItem).Tag]);
-      InitSearchFrame;
-    end;
-  end
-  else
-    FReferences[(Sender as TMenuItem).Tag].Show;
+  if FReferences[(Sender as TMenuItem).Tag] = nil then
+    FReferences[(Sender as TMenuItem).Tag] :=
+      TRefForm.Create(self, MData.Tables[(Sender as TMenuItem).Tag]);
+  FReferences[(Sender as TMenuItem).Tag].Show;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);

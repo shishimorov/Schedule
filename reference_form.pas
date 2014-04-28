@@ -34,7 +34,7 @@ type
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure InsertBtnClick(Sender: TObject);
   public
-    procedure PrepareDBGrid(var ATable: TTableInfo);
+    constructor Create(TheOwner: TComponent; ATable: TTableInfo); overload;
     procedure InitSearchFrame;
   private
     procedure RemoveInvalidPointers(var AObjects: TEditForms);
@@ -46,7 +46,7 @@ type
     FTable: TTableInfo;
     FSortedColInd: integer;
   const
-    CleanFrequency = 2;
+    CleanFrequency = 10;
     MB_YES = 6;
     MB_YESNO = 4;
     MB_ICONWARNING = 48;
@@ -55,6 +55,48 @@ type
 implementation
 
 {$R *.lfm}
+
+constructor TRefForm.Create(TheOwner: TComponent; ATable: TTableInfo); overload;
+var i: integer;
+begin
+  inherited Create(TheOwner);
+  FTable := ATable;
+  Caption := FTable.Caption;
+  SQLQuery.SQL := FTable.SQL;
+  FSortedColInd := -1;
+  for i := 0 to high(FTable.Fields) do begin
+    DBGrid.Columns.Add;
+    with DBGrid.Columns[DBGrid.Columns.Count - 1] do begin
+      Alignment := taLeftJustify;
+      Expanded := True;
+      Layout := tlCenter;
+      Title.Caption := FTable.Fields[i].Caption;
+      FieldName := FTable.GetColumnName(i);
+    end;
+
+    if FTable.Fields[i] is TRefFieldInfo then begin
+      SetLength(FRefQueryArr, Length(FRefQueryArr)+1);
+      FRefQueryArr[high(FRefQueryArr)] := TSQLQuery.Create(self);
+      with FRefQueryArr[high(FRefQueryArr)] do begin
+        DataBase := DBData.IBConnection;
+        Transaction := DBData.SQLTransaction;
+        SQL.Text := Format('SELECT t.%s, t.%s FROM %s t',
+          [(FTable.Fields[i] as TRefFieldInfo).KeyFieldName,
+          (FTable.Fields[i] as TRefFieldInfo).ListFieldName,
+          (FTable.Fields[i] as TRefFieldInfo).RefTableName]);
+        Open;
+      end;
+
+      SetLength(FRefDSArr, Length(FRefDSArr)+1);
+      FRefDSArr[high(FRefDSArr)] := TDataSource.Create(self);
+      FRefDSArr[high(FRefDSArr)].DataSet := FRefQueryArr[high(FRefQueryArr)];
+
+      FRefQueryArr[high(FRefQueryArr)].Open;
+    end;
+  end;
+  SQLQuery.Open;
+  InitSearchFrame;
+end;
 
 procedure TRefForm.DBGridTitleClick(Column: TColumn);
 var FieldName: string;
@@ -78,16 +120,14 @@ begin
   end;
 
   FSortedColInd := Column.Index;
-  //ShowMessage(SQLQuery.SQL.Text);
   SQLQuery.Open;
 end;
 
 procedure TRefForm.InsertBtnClick(Sender: TObject);
+var InsertForm: TEditForm;
 begin
-  if Length(FEditForms) > CleanFrequency then RemoveInvalidPointers(FEditForms);
-  SetLength(FEditForms, Length(FEditForms)+1);
-  FEditForms[high(FEditForms)] := TEditForm.Create(self);
-  with FEditForms[high(FEditForms)] do begin
+  InsertForm := TEditForm.Create(self);
+  with InsertForm do begin
     Prepare(FTable, DataSource, SQLQuery, DBGrid.Columns, FRefDSArr, qmInsert);
     Tag := -1;
     Show;
@@ -95,8 +135,6 @@ begin
 end;
 
 procedure TRefForm.DeleteBtnClick(Sender: TObject);
-var
-  Distance: integer;
 begin
   if Application.MessageBox('Вы действительно хотите удалить данную запись?',
     'Подтверждение', (MB_YESNO + MB_ICONWARNING)) = MB_YES
@@ -140,55 +178,11 @@ begin
   EditBtnClick(Sender);
 end;
 
-procedure TRefForm.PrepareDBGrid(var ATable: TTableInfo);
-var i: integer;
-begin
-  FTable := ATable;
-  Caption := FTable.Caption;
-  SQLQuery.SQL := FTable.SQL;
-  //ShowMessage(SQLQuery.SQL.Text);
-  FSortedColInd := -1;
-  for i := 0 to high(FTable.Fields) do begin
-    DBGrid.Columns.Add;
-    with DBGrid.Columns[DBGrid.Columns.Count - 1] do begin
-      Alignment := taLeftJustify;
-      Expanded := True;
-      Layout := tlCenter;
-      Title.Caption := FTable.Fields[i].Caption;
-      //Visible := FTable.Fields[i].Visible;
-      //Width := FTable.Fields[i].Width;
-      FieldName := FTable.GetColumnName(i);
-    end;
-
-    if FTable.Fields[i] is TRefFieldInfo then begin
-      SetLength(FRefQueryArr, Length(FRefQueryArr)+1);
-      FRefQueryArr[high(FRefQueryArr)] := TSQLQuery.Create(self);
-      with FRefQueryArr[high(FRefQueryArr)] do begin
-        DataBase := DBData.IBConnection;
-        Transaction := DBData.SQLTransaction;
-        SQL.Text := Format('SELECT t.%s, t.%s FROM %s t',
-          [(FTable.Fields[i] as TRefFieldInfo).KeyFieldName,
-          (FTable.Fields[i] as TRefFieldInfo).ListFieldName,
-          (FTable.Fields[i] as TRefFieldInfo).RefTableName]);
-        Open;
-      end;
-
-      SetLength(FRefDSArr, Length(FRefDSArr)+1);
-      FRefDSArr[high(FRefDSArr)] := TDataSource.Create(self);
-      FRefDSArr[high(FRefDSArr)].DataSet := FRefQueryArr[high(FRefQueryArr)];
-
-      FRefQueryArr[high(FRefQueryArr)].Open;
-    end;
-  end;
-  SQLQuery.Open;
-end;
-
 procedure TRefForm.InitSearchFrame;
 begin
-  FSearchFrame := TSearchFrame.Create(FilterPanel);
+  FSearchFrame := TSearchFrame.Create(FilterPanel, FTable, SQLQuery);
   FSearchFrame.Left := 2;
   FSearchFrame.Top := 2;
-  FSearchFrame.Prepare(FTable, SQLQuery);
   FilterPanel.InsertControl(FSearchFrame);
 end;
 
@@ -197,7 +191,6 @@ var i, j, k: integer;
 begin
   j := -1;
   k := 0;
-  //ShowMessage(IntToStr(Length(AObjects)));
   for i := 0 to high(AObjects) do
     if not Assigned(AObjects[i]) then begin
       j := i;
@@ -210,7 +203,6 @@ begin
         j := -1;
       end;
   SetLength(AObjects, Length(AObjects)-k);
-  //ShowMessage(IntToStr(Length(AObjects)));
 end;
 
 end.
