@@ -17,11 +17,13 @@ type
 
   TRefForm = class(TForm)
     Datasource: TDatasource;
+    TempDS: TDatasource;
     DBGrid: TDBGrid;
     DBNavigator: TDBNavigator;
     InsertBtn: TSpeedButton;
     DeleteBtn: TSpeedButton;
     EditBtn: TSpeedButton;
+    TempQuery: TSQLQuery;
     TitleImgList: TImageList;
     FilterPanel: TPanel;
     SQLQuery: TSQLQuery;
@@ -94,20 +96,15 @@ end;
 
 procedure TRefForm.DeleteBtnClick(Sender: TObject);
 var
-  FieldID: integer;
-  SavedSQL: string;
+  Distance: integer;
 begin
   if Application.MessageBox('Вы действительно хотите удалить данную запись?',
-    'Подтверждение', (MB_YESNO + MB_ICONWARNING)) = MB_YES then begin
-    with SQLQuery do begin
-      FieldID := FieldByName('ID').AsInteger;
-      Close;
-      SavedSQL := SQL.Text;
-      SQL.Text := Format('DELETE FROM %s WHERE ID = %d', [FTable.Name, FieldID]);
-      ExecSQL;
-      SQL.Text := SavedSQL;
-      Open;
-    end;
+    'Подтверждение', (MB_YESNO + MB_ICONWARNING)) = MB_YES
+  then begin
+    TempQuery.SQL.Text := Format('DELETE FROM %s WHERE ID = %d',
+      [FTable.Name, SQLQuery.FieldByName('ID').AsInteger]);
+    TempQuery.ExecSQL;
+    SQLQuery.Refresh;
   end;
 end;
 

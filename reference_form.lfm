@@ -200,4 +200,17 @@ object RefForm: TRefForm
       0000000000000000000000000000
     }
   end
+  object TempQuery: TSQLQuery
+    FieldDefs = <>
+    Database = DBData.IBConnection
+    Transaction = DBData.SQLTransaction
+    Params = <>
+    left = 168
+    top = 248
+  end
+  object TempDS: TDatasource
+    DataSet = TempQuery
+    left = 64
+    top = 248
+  end
 end

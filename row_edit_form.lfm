@@ -38,8 +38,8 @@ object EditForm: TEditForm
   end
   object TempQuery: TSQLQuery
     FieldDefs = <>
-    Database = DBCon.IBConnection
-    Transaction = DBCon.SQLTransaction
+    Database = DBData.IBConnection
+    Transaction = DBData.SQLTransaction
     Params = <>
     left = 120
     top = 8

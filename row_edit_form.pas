@@ -98,24 +98,9 @@ end;
 
 procedure TEditForm.OKButtonClick(Sender: TObject);
 var
-  SavedSQL, sqlAction, sqlParams: string;
-  FieldID, i: integer;
+  sqlAction, sqlParams: string;
+  Distance, i: integer;
 begin
-  //with FSQLQuery do begin
-  //  case FMode of
-  //  qmInsert:
-  //    begin
-  //      Insert;
-  //      for i := 0 to high(FTable.Fields) do
-  //        FieldByName(FTable.Fields[i].Name).Value := DBEdits[i].Value;
-  //      Post;
-  //    end;
-  //  qmUpdate:
-  //    begin
-  //
-  //    end;
-  //  end;
-  //end;
   for i := 0 to high(DBEdits) do
     if DBEdits[i].Value = '' then begin
       ShowMessage('Заполните все поля');
@@ -123,48 +108,41 @@ begin
       Exit;
     end;
 
-  with FSQLQuery do begin
-    FieldID := FieldByName('ID').Value;
-    Close;
-    SavedSQL := SQL.Text;
-    SQL.Clear;
-
-    case FMode of
-    qmInsert:
-      begin
-        sqlAction := '';
-        sqlParams := '';
-        for i := 1 to high(FTable.Fields) do begin
-          sqlAction += FTable.Fields[i].Name + ',';
-          sqlParams += Format(':Value_%d,', [i]);
-        end;
-        sqlAction[Length(sqlAction)] := ')';
-        sqlParams[Length(sqlParams)] := ')';
-        SQL.Add(Format('INSERT INTO %s(%s', [FTable.Name, sqlAction]));
-        SQL.Add(Format('VALUES(%s', [sqlParams]));
+  TempQuery.SQL.Clear;
+  case FMode of
+  qmInsert:
+    begin
+      Distance := FSQLQuery.RecordCount;
+      sqlAction := '';
+      sqlParams := '';
+      for i := 1 to high(FTable.Fields) do begin
+        sqlAction += FTable.Fields[i].Name + ',';
+        sqlParams += Format(':Value_%d,', [i]);
       end;
-    qmUpdate:
-      begin
-        SQL.Add(Format('UPDATE %s SET', [FTable.Name]));
-
-        for i := 1 to high(FTable.Fields) do
-          sqlAction += Format('%s = :Value_%d,', [FTable.Fields[i].Name, i]);
-
-        System.Delete(sqlAction, Length(sqlAction), 1);
-        SQL.Add(sqlAction);
-        SQL.Add(Format('WHERE ID = %d', [FieldID]));
-      end;
+      sqlAction[Length(sqlAction)] := ')';
+      sqlParams[Length(sqlParams)] := ')';
+      TempQuery.SQL.Add(Format('INSERT INTO %s(%s', [FTable.Name, sqlAction]));
+      TempQuery.SQL.Add(Format('VALUES(%s', [sqlParams]));
     end;
-
-    for i := 1 to high(FTable.Fields) do
-      ParamByName(Format('Value_%d', [i])).Value := DBEdits[i].Value;
-
-    ExecSQL;
-    SQL.Text := SavedSQL;
-    Open;
-    ApplyUpdates;
+  qmUpdate:
+    begin
+      Distance := FSQLQuery.RecNo-1;
+      TempQuery.SQL.Add(Format('UPDATE %s SET', [FTable.Name]));
+      for i := 1 to high(FTable.Fields) do
+        sqlAction += Format('%s = :Value_%d,', [FTable.Fields[i].Name, i]);
+      System.Delete(sqlAction, Length(sqlAction), 1);
+      TempQuery.SQL.Add(sqlAction);
+      TempQuery.SQL.Add(Format('WHERE ID = %d', [FSQLQuery.FieldByName('ID').AsInteger]));
+    end;
   end;
-  self.Close;
+
+  for i := 1 to high(FTable.Fields) do
+    TempQuery.ParamByName(Format('Value_%d', [i])).Value := DBEdits[i].Value;
+  TempQuery.ExecSQL;
+  FSQLQuery.Refresh;
+  FSQLQuery.MoveBy(Distance);
+
+  Close;
 end;
 
 procedure TEditForm.CancelButtonClick(Sender: TObject);
