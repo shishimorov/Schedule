@@ -3,6 +3,9 @@ object TimeTable: TTimeTable
   Height = 690
   Top = 124
   Width = 1160
+  HorzScrollBar.Page = 1160
+  VertScrollBar.Page = 690
+  AutoScroll = True
   Caption = 'Расписание'
   ClientHeight = 690
   ClientWidth = 1160
@@ -93,6 +96,7 @@ object TimeTable: TTimeTable
       AutoSize = False
       Caption = 'Название полей'
       Checked = True
+      OnClick = OnPropChange
       State = cbChecked
       TabOrder = 3
     end
@@ -133,6 +137,7 @@ object TimeTable: TTimeTable
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
       Columns = 2
+      OnItemClick = CheckFieldsItemClick
       TabOrder = 0
     end
     object FiltersBox: TGroupBox
@@ -309,6 +314,8 @@ object TimeTable: TTimeTable
     Top = 48
     Width = 820
     Anchors = [akTop, akLeft, akRight, akBottom]
+    AutoEdit = False
+    Color = clDefault
     ColCount = 1
     DefaultColWidth = 150
     DefaultRowHeight = 30
@@ -316,10 +323,13 @@ object TimeTable: TTimeTable
     HeaderHotZones = []
     HeaderPushZones = []
     MouseWheelOption = mwGrid
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goColSpanning, goDblClickAutoSize, goSmoothScroll]
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goColSpanning, goDblClickAutoSize, goSmoothScroll]
+    ParentShowHint = False
     RowCount = 1
     TabOrder = 2
     OnDrawCell = DrawGridDrawCell
+    OnMouseMove = DrawGridMouseMove
+    OnMouseUp = DrawGridMouseUp
   end
   object Datasource: TDatasource
     DataSet = SQLQuery
