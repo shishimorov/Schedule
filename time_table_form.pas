@@ -152,7 +152,7 @@ end;
 
 procedure TTimeTable.SelectBtnClick(Sender: TObject);
 var
-  FieldCounter, PrevCol, PrevRow, i: integer;
+  PrevCol, PrevRow, i: integer;
   CurCol, CurRow: string;
   CurCell: TStringList;
 begin
@@ -180,7 +180,6 @@ begin
     PrevRow := 0;
     while not EOF do begin
       CurCell := TStringList.Create;
-      FieldCounter := 0;
       for i := 1 to high(FMDTable.Fields) do begin
         if FMDTable.Fields[i].Name = FTable.Fields[FCurHFI].Name then begin
           CurCol := SQLQuery.FieldByName(FMDTable.GetColumnName(i)).AsString;

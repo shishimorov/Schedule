@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, db, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs,
   Grids, DBGrids, DbCtrls, ActnList, Menus, ExtCtrls, Buttons, EditBtn,
-  metadata, search_frame, row_edit_form, data;
+  metadata, search_frame, record_edit_form;
 
 type
 
@@ -37,16 +37,15 @@ type
     constructor Create(TheOwner: TComponent; ATable: TTableInfo); overload;
     procedure InitSearchFrame;
   private
-    procedure RemoveInvalidPointers(var AObjects: TEditForms);
+    procedure AfterEditAction(Sender: TObject);
+    procedure RemoveInvalidPointers;
   private
-    FEditForms: TEditForms;
-    FRefQueryArr: array of TSQLQuery;
-    FRefDSArr: array of TDataSource;
-    FSearchFrame: TSearchFrame;
     FTable: TTableInfo;
+    FEditForms: TEditForms;
+    FSearchFrame: TSearchFrame;
     FSortedColInd: integer;
   const
-    CleanFrequency = 10;
+    MaxEditForms = 10;
     MB_YES = 6;
     MB_YESNO = 4;
     MB_ICONWARNING = 48;
@@ -72,26 +71,6 @@ begin
       Layout := tlCenter;
       Title.Caption := FTable.Fields[i].Caption;
       FieldName := FTable.GetColumnName(i);
-    end;
-
-    if FTable.Fields[i] is TRefFieldInfo then begin
-      SetLength(FRefQueryArr, Length(FRefQueryArr)+1);
-      FRefQueryArr[high(FRefQueryArr)] := TSQLQuery.Create(self);
-      with FRefQueryArr[high(FRefQueryArr)] do begin
-        DataBase := DBData.IBConnection;
-        Transaction := DBData.SQLTransaction;
-        SQL.Text := Format('SELECT t.%s, t.%s FROM %s t',
-          [(FTable.Fields[i] as TRefFieldInfo).KeyFieldName,
-          (FTable.Fields[i] as TRefFieldInfo).ListFieldName,
-          (FTable.Fields[i] as TRefFieldInfo).RefTableName]);
-        Open;
-      end;
-
-      SetLength(FRefDSArr, Length(FRefDSArr)+1);
-      FRefDSArr[high(FRefDSArr)] := TDataSource.Create(self);
-      FRefDSArr[high(FRefDSArr)].DataSet := FRefQueryArr[high(FRefQueryArr)];
-
-      FRefQueryArr[high(FRefQueryArr)].Open;
     end;
   end;
   SQLQuery.Open;
@@ -126,12 +105,8 @@ end;
 procedure TRefForm.InsertBtnClick(Sender: TObject);
 var InsertForm: TEditForm;
 begin
-  InsertForm := TEditForm.Create(self);
-  with InsertForm do begin
-    Prepare(FTable, DataSource, SQLQuery, DBGrid.Columns, FRefDSArr, qmInsert);
-    Tag := -1;
-    Show;
-  end;
+  InsertForm := TEditForm.Create(self, FTable, @AfterEditAction);
+  InsertForm.Show;
 end;
 
 procedure TRefForm.DeleteBtnClick(Sender: TObject);
@@ -149,7 +124,7 @@ end;
 procedure TRefForm.EditBtnClick(Sender: TObject);
 var RecID, i: integer;
 begin
-  if Length(FEditForms) > CleanFrequency then RemoveInvalidPointers(FEditForms);
+  if Length(FEditForms) > MaxEditForms then RemoveInvalidPointers;
   RecID := SQLQuery.FieldByName('ID').AsInteger;
   for i := 0 to high(FEditForms) do
     if FEditForms[i].Tag = RecID then begin
@@ -157,10 +132,9 @@ begin
       Exit;
     end;
   SetLength(FEditForms, Length(FEditForms)+1);
-  FEditForms[high(FEditForms)] := nil;
-  FEditForms[high(FEditForms)] := TEditForm.Create(self);
+  FEditForms[high(FEditForms)] := TEditForm.Create(self, FTable, RecID, @AfterEditAction);
   with FEditForms[high(FEditForms)] do begin
-    Prepare(FTable, DataSource, SQLQuery, DBGrid.Columns, FRefDSArr, qmUpdate);
+    Distance := Datasource.DataSet.RecNo-1;
     Tag := RecID;
     Show;
   end;
@@ -186,23 +160,30 @@ begin
   FilterPanel.InsertControl(FSearchFrame);
 end;
 
-procedure TRefForm.RemoveInvalidPointers(var AObjects: TEditForms);
+procedure TRefForm.AfterEditAction(Sender: TObject);
+begin
+  SQLQuery.Refresh;
+  SQLQuery.MoveBy((Sender as TEditForm).Distance);
+end;
+
+procedure TRefForm.RemoveInvalidPointers;
 var i, j, k: integer;
 begin
   j := -1;
   k := 0;
-  for i := 0 to high(AObjects) do
-    if not Assigned(AObjects[i]) then begin
+  for i := 0 to high(FEditForms) do begin
+    if Assigned(FEditForms[i]) then
+      if j >= 0 then begin
+        FEditForms[j] := FEditForms[i];
+        FEditForms[i] := nil;
+        j := -1;
+      end
+    else begin
       j := i;
       inc(k);
-    end
-    else
-      if j >= 0 then begin
-        AObjects[j] := AObjects[i];
-        AObjects[i] := nil;
-        j := -1;
-      end;
-  SetLength(AObjects, Length(AObjects)-k);
+    end;
+  end;
+  SetLength(FEditForms, Length(FEditForms)-k);
 end;
 
 end.

@@ -39,7 +39,7 @@ type
   private
     FTable: TTableInfo;
     FSQLQuery: TSQLQuery;
-    FSearchEdit: TDBEditWBH;
+    FSearchEdit: TFieldEdit;
     FSearchBtn: TSpeedButton;
     FFilters: TFilters;
   end;

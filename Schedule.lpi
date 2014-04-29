@@ -97,12 +97,12 @@
         <UnitName Value="search_filter_frame"/>
       </Unit7>
       <Unit8>
-        <Filename Value="row_edit_form.pas"/>
+        <Filename Value="record_edit_form.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="EditForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="row_edit_form"/>
+        <UnitName Value="record_edit_form"/>
       </Unit8>
       <Unit9>
         <Filename Value="time_table_form.pas"/>

@@ -31,12 +31,12 @@ object EditForm: TEditForm
     TabOrder = 0
     ShowButtons = [pbOK, pbCancel]
   end
-  object TempDS: TDatasource
+  object Datasource: TDatasource
     DataSet = RefForm.SQLQuery
     left = 32
     top = 8
   end
-  object TempQuery: TSQLQuery
+  object SQLQuery: TSQLQuery
     FieldDefs = <>
     Database = DBData.IBConnection
     Transaction = DBData.SQLTransaction

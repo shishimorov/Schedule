@@ -42,7 +42,7 @@ type
     CloseFilter: TCloseFilterEvent;
   private
     FTable: TTableInfo;
-    FFilterEdit: TDBEditWBH;
+    FFilterEdit: TFieldEdit;
   public
     property ParamQuery: TParamQuery read GetParamQuery;
   end;
