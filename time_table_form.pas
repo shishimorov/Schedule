@@ -50,6 +50,7 @@ type
     function GetTitles(AFieldIndex: integer; var AIDArray: TIntArray): TStringList;
     function GetTitlesQuery(AFieldIndex: integer): string;
     function GetTriangle(ARect: TRect; ACol, ARow: integer): TPoints;
+    procedure PrepareCanvas;
     procedure DrawTitle(ACol, ARow: integer; ARect: TRect);
     procedure ClearCellData;
   private
@@ -95,14 +96,7 @@ var
   tmp: string;
   CurTop, i, j, k: integer;
 begin
-  with DrawGrid.Canvas do begin
-    Pen.Color := clBlack;
-    Pen.Style := psSolid;
-    Brush.Color := clBlack;
-    Brush.Style := bsClear;
-    Font.Color := clBlack;
-  end;
-
+  PrepareCanvas;
   if (aCol = 0) and (aRow = 0) then Exit;
   if (aCol = 0) xor (aRow = 0) then begin
     DrawTitle(aCol, aRow, aRect);
@@ -121,7 +115,7 @@ begin
         inc(k);
       end;
     end;
-    if (k > 0) and (i < high(FCellData[aCol][aRow])) then begin
+    if k > 0 then begin
       CurTop += (FTextHeight+4)*k+1;
       DrawGrid.Canvas.MoveTo(aRect.Left, CurTop);
       DrawGrid.Canvas.LineTo(aRect.Right, CurTop);
@@ -130,8 +124,8 @@ begin
   if (Length(FCellData[aCol][aRow]) > 1) and
      (DrawGrid.RowHeights[aRow] < FDefaultRowHeight*Length(FCellData[aCol][aRow]))
   then begin
-    DrawGrid.Brush.Style := bsHorizontal;
-    DrawGrid.Brush.Color := clRed;
+    DrawGrid.Brush.Style := bsSolid;
+    DrawGrid.Brush.Color := clGreen;
     DrawGrid.Canvas.Polygon(GetTriangle(aRect, aCol, aRow));
   end;
 end;
@@ -145,9 +139,10 @@ procedure TTimeTable.DrawGridMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   with DrawGrid do
-    if DrawGrid.RowHeights[Row] < FDefaultRowHeight*Length(FCellData[Col][Row]) then
-      if IsPointInPolygon(X, Y, GetTriangle(CellRect(Col, Row), Col, Row)) then
-        RowHeights[Row] := FDefaultRowHeight*Length(FCellData[Col][Row]);
+    if (Row > 0) and (Col > 0) then
+      if RowHeights[Row] < FDefaultRowHeight*Length(FCellData[Col][Row]) then
+        if IsPointInPolygon(X, Y, GetTriangle(CellRect(Col, Row), Col, Row)) then
+          RowHeights[Row] := FDefaultRowHeight*Length(FCellData[Col][Row]);
 end;
 
 procedure TTimeTable.SelectBtnClick(Sender: TObject);
@@ -331,6 +326,17 @@ begin
   DrawGrid.RowHeights[0] := 30;
   DrawGrid.ColWidths[0] := 150;
   DrawGrid.Repaint;
+end;
+
+procedure TTimeTable.PrepareCanvas;
+begin
+  with DrawGrid.Canvas do begin
+    Pen.Color := clBlack;
+    Pen.Style := psSolid;
+    Brush.Color := clBlack;
+    Brush.Style := bsClear;
+    Font.Color := clBlack;
+  end;
 end;
 
 function TTimeTable.GetTriangle(ARect: TRect; ACol, ARow: integer): TPoints;
