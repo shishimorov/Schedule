@@ -74,7 +74,8 @@ end;
 procedure TSearchFrame.InitSearchEdit(ADataType: TDataType);
 begin
   FSearchEdit.Free;
-  FSearchEdit := GetEditClass(ADataType).Create(SearchBox, 2, 33, 292, 27, @SearchQueryChange);
+  FSearchEdit := GetEditClass(ADataType).Create(SearchBox, 2, 33, 292, 27);
+  FSearchEdit.OnChange := @SearchQueryChange;
   InitSearchBtn(296, 33);
 end;
 
@@ -149,8 +150,8 @@ begin
   NewFilter := AddFilter(FiltersBox, FFilters, FTable);
   if NewFilter <> nil then
     with NewFilter do begin
-      SearchQueryChange := @self.SearchQueryChange;
-      CloseFilter := @CloseFilterClick;
+      OnChange := @self.SearchQueryChange;
+      OnClose := @CloseFilterClick;
       self.Height := self.Height+Height;
     end;
 end;

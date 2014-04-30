@@ -74,20 +74,6 @@ object TimeTable: TTimeTable
       Caption = 'По вертикали:'
       ParentColor = False
     end
-    object SelectBtn: TButton
-      AnchorSideLeft.Control = VerticalFieldBox
-      AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Control = TopPanel
-      Left = 589
-      Height = 29
-      Top = 11
-      Width = 75
-      BorderSpacing.Left = 10
-      BorderSpacing.Top = 10
-      Caption = 'Выбрать'
-      OnClick = SelectBtnClick
-      TabOrder = 2
-    end
     object ShowFieldNames: TCheckBox
       Left = 672
       Height = 29
@@ -98,7 +84,15 @@ object TimeTable: TTimeTable
       Checked = True
       OnClick = OnPropChange
       State = cbChecked
-      TabOrder = 3
+      TabOrder = 2
+    end
+    object SelectBtn: TSpeedButton
+      Left = 592
+      Height = 29
+      Top = 11
+      Width = 71
+      Caption = 'Выбрать'
+      OnClick = SelectBtnClick
     end
   end
   object FilterPanel: TPanel
@@ -328,6 +322,7 @@ object TimeTable: TTimeTable
     RowCount = 1
     TabOrder = 2
     OnDrawCell = DrawGridDrawCell
+    OnHeaderClick = DrawGridHeaderClick
     OnMouseMove = DrawGridMouseMove
     OnMouseUp = DrawGridMouseUp
   end

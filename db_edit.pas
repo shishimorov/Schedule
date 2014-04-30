@@ -11,24 +11,28 @@ uses
 type
   TFieldEdit = class(TPersistent)
   public
-    constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth, AHeight: integer;
-      AOnChange: TNotifyEvent); virtual; abstract;
+    constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth,
+      AHeight: integer); virtual; abstract;
   protected
+    function GetOnChange: TNotifyEvent; virtual; abstract;
+    procedure SetOnChange(AOnChange: TNotifyEvent); virtual; abstract;
     function GetValue: Variant; virtual; abstract;
     procedure SetValue(AValue: Variant); virtual; abstract;
     function GetEnabled: boolean; virtual; abstract;
     procedure SetEnabled(AValue: boolean); virtual; abstract;
   public
+    property OnChange: TNotifyEvent read GetOnChange write SetOnChange;
     property Value: Variant read GetValue write SetValue;
     property Enabled: boolean read GetEnabled write SetEnabled;
   end;
 
   TStrEdit = class(TFieldEdit)
   public
-    constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth, AHeight: integer;
-      AOnChange: TNotifyEvent); override;
+    constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth,
+      AHeight: integer); override;
     destructor Destroy; override;
   protected
+    procedure SetOnChange(AOnChange: TNotifyEvent); override;
     function GetValue: Variant; override;
     procedure SetValue(AValue: Variant); override;
     function GetEnabled: boolean; override;
@@ -39,18 +43,19 @@ type
 
   TIntEdit = class(TStrEdit)
   public
-    constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth, AHeight: integer;
-      AOnChange: TNotifyEvent); override;
+    constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth,
+      AHeight: integer); override;
   private
     procedure FOnKeyPress(Sender: TObject; var Key: char);
   end;
 
   TTimeEdit = class(TFieldEdit)
   public
-    constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth, AHeight: integer;
-      AOnChange: TNotifyEvent); override;
+    constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth,
+      AHeight: integer); override;
     destructor Destroy; override;
   protected
+    procedure SetOnChange(AOnChange: TNotifyEvent); override;
     function GetValue: Variant; override;
     procedure SetValue(AValue: Variant); override;
     function GetEnabled: boolean; override;
@@ -61,10 +66,11 @@ type
 
   TListEdit = class(TFieldEdit)
   public
-    constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth, AHeight: integer;
-      AOnChange: TNotifyEvent; ADataSource: TDataSource; AField: TRefFieldInfo); overload;
+    constructor Create(TheOwner: TComponent; ALeft, ATop, AWidth,
+      AHeight: integer;ADataSource: TDataSource; AField: TRefFieldInfo); overload;
     destructor Destroy; override;
   protected
+    procedure SetOnChange(AOnChange: TNotifyEvent); override;
     function GetValue: Variant; override;
     procedure SetValue(AValue: Variant); override;
     function GetEnabled: boolean; override;
@@ -80,7 +86,7 @@ function GetEditClass(ADataType: TDataType): TDBEditWBHClass;
 implementation
 
 constructor TStrEdit.Create(TheOwner: TComponent; ALeft, ATop, AWidth,
-  AHeight: integer; AOnChange: TNotifyEvent);
+  AHeight: integer);
 begin
   FEdit := TEdit.Create(TheOwner);
   with FEdit do begin
@@ -90,13 +96,17 @@ begin
     Width := AWidth;
     Height := AHeight;
     Text := '';
-    OnChange := AOnChange;
   end;
 end;
 
 destructor TStrEdit.Destroy;
 begin
   FEdit.Free;
+end;
+
+procedure TStrEdit.SetOnChange(AOnChange: TNotifyEvent);
+begin
+  FEdit.OnChange := AOnChange;
 end;
 
 function TStrEdit.GetValue: Variant;
@@ -120,9 +130,9 @@ begin
 end;
 
 constructor TIntEdit.Create(TheOwner: TComponent; ALeft, ATop, AWidth,
-  AHeight: integer; AOnChange: TNotifyEvent);
+  AHeight: integer);
 begin
-  inherited Create(TheOwner, ALeft, ATop, AWidth, AHeight, AOnChange);
+  inherited Create(TheOwner, ALeft, ATop, AWidth, AHeight);
   FEdit.OnKeyPress := @FOnKeyPress;
 end;
 
@@ -132,7 +142,7 @@ begin
 end;
 
 constructor TTimeEdit.Create(TheOwner: TComponent; ALeft, ATop, AWidth,
-  AHeight: integer; AOnChange: TNotifyEvent);
+  AHeight: integer);
 var
   SpinWidth: integer;
 begin
@@ -147,7 +157,6 @@ begin
     MinValue := 0;
     MaxValue := 23;
     Value := 0;
-    OnChange := AOnChange;
   end;
   FEdit[2] := TSpinEdit.Create(TheOwner);
   with FEdit[2] do begin
@@ -159,7 +168,6 @@ begin
     MinValue := 0;
     MaxValue := 60;
     Value := 0;
-    OnChange := AOnChange;
   end;
   FEdit[3] := TSpinEdit.Create(TheOwner);
   with FEdit[3] do begin
@@ -171,7 +179,6 @@ begin
     MinValue := 0;
     MaxValue := 60;
     Value := 0;
-    OnChange := AOnChange;
   end;
 end;
 
@@ -179,6 +186,13 @@ destructor TTimeEdit.Destroy;
 var i: integer;
 begin
   for i := 1 to high(FEdit) do FEdit[i].Free;
+end;
+
+procedure TTimeEdit.SetOnChange(AOnChange: TNotifyEvent);
+begin
+  FEdit[1].OnChange := AOnChange;
+  FEdit[2].OnChange := AOnChange;
+  FEdit[3].OnChange := AOnChange;
 end;
 
 function TTimeEdit.GetValue: Variant;
@@ -209,7 +223,7 @@ begin
 end;
 
 constructor TListEdit.Create(TheOwner: TComponent; ALeft, ATop, AWidth,
-  AHeight: integer; AOnChange: TNotifyEvent; ADataSource: TDataSource; AField: TRefFieldInfo);
+  AHeight: integer; ADataSource: TDataSource; AField: TRefFieldInfo);
 begin
   FEdit := TDBLookupComboBox.Create(TheOwner);
   with FEdit do begin
@@ -218,7 +232,6 @@ begin
     Top := ATop;
     Width := AWidth;
     Height := AHeight;
-    OnChange := AOnChange;
     ReadOnly := True;
     ListSource := ADataSource;
     ListField := AnsiDequotedStr(AField.ListFieldName, '"');
@@ -229,6 +242,11 @@ end;
 destructor TListEdit.Destroy;
 begin
   FEdit.Free;
+end;
+
+procedure TListEdit.SetOnChange(AOnChange: TNotifyEvent);
+begin
+  FEdit.OnChange := AOnChange;
 end;
 
 function TListEdit.GetValue: Variant;

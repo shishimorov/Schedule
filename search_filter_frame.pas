@@ -36,14 +36,18 @@ type
     procedure InitFieldBox;
     procedure InitOperBox(ADataType: TDataType);
     procedure InitFilterEdit(ADataType: TDataType);
+    procedure SetOnChange(AOnChange: TNotifyEvent);
+    procedure OnFilterChange(Sender: TObject);
+    procedure OnFilterClose(AFilterIndex: integer);
     function GetParamQuery: TParamQuery;
-  public
-    SearchQueryChange: TNotifyEvent;
-    CloseFilter: TCloseFilterEvent;
   private
+    FOnChange: TNotifyEvent;
+    FOnClose: TCloseFilterEvent;
     FTable: TTableInfo;
     FFilterEdit: TFieldEdit;
   public
+    property OnChange: TNotifyEvent read FOnChange write SetOnChange;
+    property OnClose: TCloseFilterEvent read FOnClose write FOnClose;
     property ParamQuery: TParamQuery read GetParamQuery;
   end;
 
@@ -58,8 +62,14 @@ begin
   InitFieldBox;
   InitOperBox(FTable.Fields[FieldBox.ItemIndex].DataType);
   InitFilterEdit(FTable.Fields[FieldBox.ItemIndex].DataType);
-  ApplyFilter.OnChange := SearchQueryChange;
-  OperBox.OnChange := SearchQueryChange;
+end;
+
+procedure TFilterFrame.SetOnChange(AOnChange: TNotifyEvent);
+begin
+  FOnChange := AOnChange;
+  ApplyFilter.OnChange := FOnChange;
+  OperBox.OnChange := FOnChange;
+  FFilterEdit.OnChange := FOnChange;
 end;
 
 function TFilterFrame.GetParamQuery: TParamQuery;
@@ -118,15 +128,24 @@ end;
 procedure TFilterFrame.InitFilterEdit(ADataType: TDataType);
 begin
   FFilterEdit.Free;
-  FFilterEdit :=
-    GetEditClass(ADataType).Create(FilterBox, 2, 31, 265, 27, SearchQueryChange);
+  FFilterEdit := GetEditClass(ADataType).Create(FilterBox, 2, 31, 265, 27);
 end;
 
 procedure TFilterFrame.FieldBoxChange(Sender: TObject);
 begin
   InitOperBox(FTable.Fields[FieldBox.ItemIndex].DataType);
   InitFilterEdit(FTable.Fields[FieldBox.ItemIndex].DataType);
-  if SearchQueryChange <> nil then SearchQueryChange(self);
+  OnFilterChange(self);
+end;
+
+procedure TFilterFrame.OnFilterChange(Sender: TObject);
+begin
+  if FOnChange <> nil then FOnChange(Sender);
+end;
+
+procedure TFilterFrame.OnFilterClose(AFilterIndex: integer);
+begin
+  if FOnClose <> nil then FOnClose(AFilterIndex);
 end;
 
 procedure TFilterFrame.CondBtnClick(Sender: TObject);
@@ -143,12 +162,13 @@ begin
       CondBtn.Caption := 'И';
     end;
   end;
-  if SearchQueryChange <> nil then SearchQueryChange(self);
+  OnFilterChange(self);
 end;
 
 procedure TFilterFrame.CloseBtnClick(Sender: TObject);
 begin
-  CloseFilter(Tag - 1);
+  OnFilterChange(self);
+  OnFilterClose(Tag-1);
 end;
 
 end.

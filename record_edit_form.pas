@@ -180,12 +180,12 @@ begin
       FRefDSArr[high(FRefDSArr)].DataSet := FRefQueryArr[high(FRefQueryArr)];
       FRefQueryArr[high(FRefQueryArr)].Open;
 
-      FieldEdits[i] := TListEdit.Create(self, 200, i*32+10, 180, 27, nil,
+      FieldEdits[i] := TListEdit.Create(self, 200, i*32+10, 180, 27,
           FRefDSArr[high(FRefDSArr)], FTable.Fields[i] as TRefFieldInfo);
     end
     else
       FieldEdits[i] :=
-        GetEditClass(FTable.Fields[i].DataType).Create(self, 200, i*32+10, 180, 27, nil);
+        GetEditClass(FTable.Fields[i].DataType).Create(self, 200, i*32+10, 180, 27);
   end;
   FieldEdits[0].Enabled := False;
 end;
