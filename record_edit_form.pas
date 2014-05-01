@@ -13,6 +13,7 @@ type
 
   { TEditForm }
 
+  TDisabledFields = set of 1..255;
   TQueryMode = (qmInsert, qmUpdate);
   TSQLQueryArr = array of TSQLQuery;
   TDataSourceArr = array of TDataSource;
@@ -27,7 +28,11 @@ type
     constructor Create(TheOwner: TComponent; ATable: TTableInfo;
       AfterInsertAction: TNotifyEvent); overload;
     constructor Create(TheOwner: TComponent; ATable: TTableInfo;
-      ARecordID: integer; AfterEditAction: TNotifyEvent); overload;
+      AfterInsertAction: TNotifyEvent; DisabledFields: TDisabledFields); overload;
+    constructor Create(TheOwner: TComponent; ATable: TTableInfo; ARecordID: integer;
+      AfterEditAction: TNotifyEvent); overload;
+    constructor Create(TheOwner: TComponent; ATable: TTableInfo; ARecordID: integer;
+      AfterEditAction: TNotifyEvent; DisabledFields: TDisabledFields); overload;
   private
     procedure InitComponents;
   public
@@ -70,6 +75,15 @@ begin
 end;
 
 constructor TEditForm.Create(TheOwner: TComponent; ATable: TTableInfo;
+  AfterInsertAction: TNotifyEvent; DisabledFields: TDisabledFields);
+var i: integer;
+begin
+  Create(TheOwner, ATable, AfterInsertAction);
+  for i := 0 to high(FieldEdits) do
+    if i in DisabledFields then FieldEdits[i].Enabled := False;
+end;
+
+constructor TEditForm.Create(TheOwner: TComponent; ATable: TTableInfo;
   ARecordID: integer; AfterEditAction: TNotifyEvent);
 var i: integer;
 begin
@@ -92,6 +106,15 @@ begin
         FieldEdits[i].Value := SQLQuery.FieldByName(GetColumnName(i)).Value;
     end;
   SQLQuery.Close;
+end;
+
+constructor TEditForm.Create(TheOwner: TComponent; ATable: TTableInfo;
+  ARecordID: integer; AfterEditAction: TNotifyEvent; DisabledFields: TDisabledFields);
+var i: integer;
+begin
+  Create(TheOwner, ATable, ARecordID, AfterEditAction);
+  for i := 0 to high(FieldEdits) do
+    if i in DisabledFields then FieldEdits[i].Enabled := False;
 end;
 
 procedure TEditForm.OKButtonClick(Sender: TObject);
@@ -187,7 +210,6 @@ begin
       FieldEdits[i] :=
         GetEditClass(FTable.Fields[i].DataType).Create(self, 200, i*32+10, 180, 27);
   end;
-  FieldEdits[0].Enabled := False;
 end;
 
 end.

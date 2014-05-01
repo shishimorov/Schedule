@@ -105,7 +105,7 @@ end;
 procedure TRefForm.InsertBtnClick(Sender: TObject);
 var InsertForm: TEditForm;
 begin
-  InsertForm := TEditForm.Create(self, FTable, @AfterEditAction);
+  InsertForm := TEditForm.Create(self, FTable, @AfterEditAction, [0]);
   InsertForm.Show;
 end;
 
@@ -132,7 +132,7 @@ begin
       Exit;
     end;
   SetLength(FEditForms, Length(FEditForms)+1);
-  FEditForms[high(FEditForms)] := TEditForm.Create(self, FTable, RecID, @AfterEditAction);
+  FEditForms[high(FEditForms)] := TEditForm.Create(self, FTable, RecID, @AfterEditAction, [0]);
   with FEditForms[high(FEditForms)] do begin
     Distance := Datasource.DataSet.RecNo-1;
     Tag := RecID;

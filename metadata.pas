@@ -249,6 +249,10 @@ begin
       AddField(True, 'Name', 'Аудитория', 120, dtStr);
       AddField(True, '"Size"', 'Размер', 100, dtInt);
     end;
+    with AddTable('Weeks', 'Недели') do begin
+      AddField(True, 'ID', 'ID', 40, dtInt);
+      AddField(True, 'Name', 'Неделя', 120, dtStr);
+    end;
     with AddTable('Professors_Subjects', 'Специализация преподавателей') do begin
       AddField(True, 'ID', 'ID', 40, dtInt);
       AddRefField(True, 'Professor_ID', 'Преподаватель', 'Professors', 'ID', 'Name', 120, dtStr);
@@ -264,11 +268,11 @@ begin
       AddRefField(True, 'Subject_ID', 'Предмет', 'Subjects', 'ID', 'Name', 200, dtStr);
       AddRefField(True, 'Subject_Type_ID', 'Тип', 'Subject_Types', 'ID', 'Name', 60, dtStr);
       AddRefField(True, 'Professor_ID', 'Преподаватель', 'Professors', 'ID', 'Name', 150, dtStr);
-      AddRefField(True, 'Lesson_Index', 'Пара №', 'Lessons', 'ID', '"Index"', 80, dtInt);
+      AddRefField(True, 'Lesson_Index', 'Время начала', 'Lessons', 'ID', '"Begin"', 80, dtTime);
       AddRefField(True, 'Day_Index', 'День недели', 'Days', 'ID', 'Name', '"Index"', 130, dtStr);
       AddRefField(True, 'Group_ID', 'Группа', 'Groups', 'ID', 'Name', 130, dtStr);
       AddRefField(True, 'Room_ID', 'Аудитория', 'Rooms', 'ID', 'Name', 130, dtStr);
-      AddField(True, 'Week', 'Неделя', 80, dtInt);
+      AddRefField(True, 'Week_ID', 'Неделя', 'Weeks', 'ID', 'Name', 130, dtStr);
     end;
   end;
 
@@ -289,4 +293,4 @@ initialization
 RegisterMetaData;
 
 end.
-
+

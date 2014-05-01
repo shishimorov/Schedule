@@ -232,6 +232,7 @@ begin
     Top := ATop;
     Width := AWidth;
     Height := AHeight;
+    Style := csDropDownList;
     ReadOnly := True;
     ListSource := ADataSource;
     ListField := AnsiDequotedStr(AField.ListFieldName, '"');
