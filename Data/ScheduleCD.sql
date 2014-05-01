@@ -57,6 +57,13 @@ CREATE TABLE Rooms
 	CONSTRAINT PK_Rooms PRIMARY KEY(ID)
 );
 
+CREATE TABLE Weeks
+(
+	ID integer NOT NULL,
+	Name varchar(50) NOT NULL,
+	CONSTRAINT PK_Weeks PRIMARY KEY(ID)
+);
+
 CREATE TABLE Professors_Subjects
 (
 	ID integer NOT NULL,
@@ -98,7 +105,7 @@ CREATE TABLE Schedule_Items
 	Day_Index integer NOT NULL,
 	Group_ID integer NOT NULL,
 	Room_ID integer,
-	Week integer NOT NULL, /* 1 - четная, 2 - нечетная, 0 - все */
+	Week_ID integer NOT NULL,
 	CONSTRAINT PK_Items PRIMARY KEY(ID),
 	CONSTRAINT FK_SI_Subject_ID FOREIGN KEY(Subject_ID)
 		REFERENCES Subjects(ID)
@@ -121,7 +128,9 @@ CREATE TABLE Schedule_Items
 	CONSTRAINT FK_SI_Room_ID FOREIGN KEY(Room_ID)
 		REFERENCES Rooms(ID)
 		ON DELETE SET NULL
-		ON UPDATE CASCADE	
+		ON UPDATE CASCADE,
+	CONSTRAINT FK_SI_Week_ID FOREIGN KEY(Week_ID)
+		REFERENCES Weeks(ID)	
 );
 
 COMMIT;
