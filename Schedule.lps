@@ -117,9 +117,9 @@
         <UnitName Value="record_edit_form"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="74"/>
+        <TopLine Value="113"/>
         <CursorPos X="7" Y="212"/>
-        <UsageCount Value="189"/>
+        <UsageCount Value="194"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit8>
@@ -133,9 +133,9 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="214"/>
-        <CursorPos X="5" Y="252"/>
-        <UsageCount Value="120"/>
+        <TopLine Value="301"/>
+        <CursorPos X="77" Y="346"/>
+        <UsageCount Value="125"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit9>
@@ -148,7 +148,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="11"/>
         <CursorPos X="1" Y="42"/>
-        <UsageCount Value="32"/>
+        <UsageCount Value="31"/>
       </Unit10>
       <Unit11>
         <Filename Value="filter.pas"/>
@@ -159,7 +159,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="117"/>
         <CursorPos X="23" Y="143"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="32"/>
       </Unit11>
       <Unit12>
         <Filename Value="searchframe.pas"/>
@@ -170,7 +170,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="11" Y="3"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit12>
       <Unit13>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-db/src/sqldb/sqldb.pp"/>
@@ -178,7 +178,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="314"/>
         <CursorPos X="3" Y="340"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="0"/>
       </Unit13>
       <Unit14>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-db/src/base/bufdataset.pas"/>
@@ -186,7 +186,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="491"/>
         <CursorPos X="15" Y="516"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit14>
       <Unit15>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-db/src/base/db.pas"/>
@@ -194,14 +194,14 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1594"/>
         <CursorPos X="14" Y="1617"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit15>
       <Unit16>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-db/src/base/database.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="507"/>
         <CursorPos X="3" Y="557"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit16>
       <Unit17>
         <Filename Value="../../../.cache/.fr-0z5Png/VGEditor/main.pas"/>
@@ -209,7 +209,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="205"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit17>
       <Unit18>
         <Filename Value="refform.pas"/>
@@ -217,7 +217,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="16" Y="13"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit18>
       <Unit19>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-db/src/sqldb/interbase/ibconnection.pp"/>
@@ -225,7 +225,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit19>
       <Unit20>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/dbgrids.pas"/>
@@ -233,28 +233,28 @@
         <WindowIndex Value="0"/>
         <TopLine Value="43"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit20>
       <Unit21>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/objpas/classes/classesh.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1644"/>
         <CursorPos X="3" Y="1670"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit21>
       <Unit22>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/systemh.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="227"/>
         <CursorPos X="3" Y="253"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit22>
       <Unit23>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-db/src/base/dataset.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1850"/>
         <CursorPos X="3" Y="1853"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit23>
       <Unit24>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/grids.pas"/>
@@ -262,7 +262,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="124"/>
         <CursorPos X="3" Y="151"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit24>
       <Unit25>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-xml/src/xmlconf.pp"/>
@@ -270,7 +270,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="357"/>
         <CursorPos X="3" Y="293"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit25>
       <Unit26>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/dbctrls.pp"/>
@@ -278,7 +278,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1065"/>
         <CursorPos X="3" Y="1091"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit26>
       <Unit27>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/forms.pp"/>
@@ -286,7 +286,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1364"/>
         <CursorPos X="17" Y="1388"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit27>
       <Unit28>
         <Filename Value="../../../.cache/.fr-RcEeJu/VGEditor/VGEditor.lpr"/>
@@ -294,14 +294,14 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit28>
       <Unit29>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/include/application.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="238"/>
         <CursorPos X="3" Y="243"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit29>
       <Unit30>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/lclproc.pas"/>
@@ -309,7 +309,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1946"/>
         <CursorPos X="3" Y="1948"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit30>
       <Unit31>
         <Filename Value="/Langs/lazarus/lcl/dbgrids.pas"/>
@@ -317,14 +317,14 @@
         <WindowIndex Value="0"/>
         <TopLine Value="526"/>
         <CursorPos X="30" Y="574"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit31>
       <Unit32>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/interfaces/gtk2/gtk2widgetset.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1275"/>
         <CursorPos X="1" Y="1300"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit32>
       <Unit33>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/dbgrids.pas"/>
@@ -332,28 +332,28 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1952"/>
         <CursorPos X="1" Y="1978"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit33>
       <Unit34>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/customcombobox.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="939"/>
         <CursorPos X="3" Y="948"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit34>
       <Unit35>
         <Filename Value="/Langs/lazarus/lcl/include/customform.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1934"/>
         <CursorPos X="1" Y="1961"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit35>
       <Unit36>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-db/src/base/dsparams.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="159"/>
         <CursorPos X="3" Y="161"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit36>
       <Unit37>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/grids.pas"/>
@@ -361,21 +361,21 @@
         <WindowIndex Value="0"/>
         <TopLine Value="6799"/>
         <CursorPos X="3" Y="6805"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit37>
       <Unit38>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/objpas/classes/collect.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="312"/>
         <CursorPos X="3" Y="314"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit38>
       <Unit39>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/dbcustomnavigator.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="458"/>
         <CursorPos X="1" Y="485"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit39>
       <Unit40>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/stdctrls.pp"/>
@@ -383,28 +383,28 @@
         <WindowIndex Value="0"/>
         <TopLine Value="213"/>
         <CursorPos X="3" Y="240"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit40>
       <Unit41>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/control.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1278"/>
         <CursorPos X="1" Y="1304"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit41>
       <Unit42>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/fpimagebitmap.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="115"/>
         <CursorPos X="1" Y="141"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit42>
       <Unit43>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/objpas/classes/persist.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="32"/>
         <CursorPos X="3" Y="36"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit43>
       <Unit44>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/spin.pp"/>
@@ -412,7 +412,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="142"/>
         <CursorPos X="14" Y="168"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit44>
       <Unit45>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/controls.pp"/>
@@ -420,7 +420,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1000"/>
         <CursorPos X="3" Y="1026"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit45>
       <Unit46>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/lclclasses.pp"/>
@@ -428,7 +428,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="16"/>
         <CursorPos X="3" Y="42"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit46>
       <Unit47>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/dialogs.pp"/>
@@ -436,7 +436,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="483"/>
         <CursorPos X="11" Y="509"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit47>
       <Unit48>
         <Filename Value="filter.lfm"/>
@@ -446,7 +446,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit48>
       <Unit49>
@@ -455,35 +455,35 @@
         <WindowIndex Value="0"/>
         <TopLine Value="791"/>
         <CursorPos X="14" Y="816"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit49>
       <Unit50>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/objpash.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="214"/>
         <CursorPos X="20" Y="240"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit50>
       <Unit51>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/objpas/classes/stringl.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="531"/>
         <CursorPos X="3" Y="538"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit51>
       <Unit52>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/wincontrol.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="8368"/>
         <CursorPos X="3" Y="8377"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit52>
       <Unit53>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/customform.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="2157"/>
         <CursorPos X="1" Y="2183"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit53>
       <Unit54>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/forms.pp"/>
@@ -491,77 +491,77 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1361"/>
         <CursorPos X="14" Y="1385"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit54>
       <Unit55>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/dblookup.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="350"/>
         <CursorPos X="3" Y="378"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit55>
       <Unit56>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/sstrings.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="43"/>
         <CursorPos X="3" Y="45"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit56>
       <Unit57>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-db/src/base/fields.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="448"/>
         <CursorPos X="3" Y="451"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit57>
       <Unit58>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/objpas.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="962"/>
         <CursorPos X="11" Y="964"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit58>
       <Unit59>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/dblookupcombobox.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="95"/>
         <CursorPos X="3" Y="97"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit59>
       <Unit60>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/objpas/sysutils/sysstrh.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="76"/>
         <CursorPos X="10" Y="102"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="0"/>
       </Unit60>
       <Unit61>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/objpas/sysutils/sysstr.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1775"/>
         <CursorPos X="3" Y="1778"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="0"/>
       </Unit61>
       <Unit62>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/varianth.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="199"/>
         <CursorPos X="10" Y="225"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="5"/>
       </Unit62>
       <Unit63>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/variant.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1051"/>
         <CursorPos X="5" Y="1053"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit63>
       <Unit64>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/application.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="209"/>
         <CursorPos X="56" Y="235"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit64>
       <Unit65>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/variants.pp"/>
@@ -569,7 +569,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="125"/>
         <CursorPos X="10" Y="151"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="1"/>
       </Unit65>
       <Unit66>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/graphics.pp"/>
@@ -577,7 +577,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="37"/>
         <CursorPos X="3" Y="63"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="12"/>
       </Unit66>
       <Unit67>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-image/src/fpcanvas.pp"/>
@@ -585,49 +585,49 @@
         <WindowIndex Value="0"/>
         <TopLine Value="115"/>
         <CursorPos X="50" Y="141"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="11"/>
       </Unit67>
       <Unit68>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/canvas.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1309"/>
         <CursorPos X="1" Y="1335"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit68>
       <Unit69>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/winapih.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="76"/>
         <CursorPos X="10" Y="102"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit69>
       <Unit70>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/winapi.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="285"/>
         <CursorPos X="3" Y="287"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit70>
       <Unit71>
         <Filename Value="/lazarus/fpc/2.6.2/source/rtl/objpas/classes/classesh.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="654"/>
         <CursorPos X="16" Y="681"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit71>
       <Unit72>
         <Filename Value="/lazarus/fpc/2.6.2/source/rtl/objpas/classes/stringl.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="567"/>
         <CursorPos X="3" Y="570"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit72>
       <Unit73>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/include/customcheckgroup.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="78"/>
         <CursorPos X="1" Y="104"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="5"/>
       </Unit73>
       <Unit74>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/lazregions.pas"/>
@@ -635,7 +635,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="80"/>
         <CursorPos X="10" Y="106"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit74>
       <Unit75>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/lresources.pp"/>
@@ -643,7 +643,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="3080"/>
         <CursorPos X="1" Y="3104"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit75>
       <Unit76>
         <Filename Value="/usr/share/lazarus/1.2.0/lcl/extctrls.pp"/>
@@ -651,7 +651,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="468"/>
         <CursorPos X="14" Y="494"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit76>
       <Unit77>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/objpas/types.pp"/>
@@ -659,7 +659,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="266"/>
         <CursorPos X="10" Y="292"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit77>
     </Units>
     <General>
@@ -668,123 +668,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="186" Column="11" TopLine="163"/>
+        <Caret Line="39" Column="53" TopLine="13"/>
       </Position1>
       <Position2>
-        <Filename Value="record_edit_form.pas"/>
-        <Caret Line="82" Column="63" TopLine="66"/>
+        <Filename Value="time_table_form.pas"/>
+        <Caret Line="166" Column="33" TopLine="140"/>
       </Position2>
       <Position3>
-        <Filename Value="record_edit_form.pas"/>
-        <Caret Line="16" Column="33" TopLine="1"/>
+        <Filename Value="time_table_form.pas"/>
+        <Caret Line="180" Column="6" TopLine="172"/>
       </Position3>
       <Position4>
-        <Filename Value="record_edit_form.pas"/>
-        <Caret Line="16" Column="34" TopLine="1"/>
+        <Filename Value="time_table_form.pas"/>
+        <Caret Line="232" Column="11" TopLine="191"/>
       </Position4>
       <Position5>
-        <Filename Value="record_edit_form.pas"/>
-        <Caret Line="115" Column="39" TopLine="77"/>
+        <Filename Value="time_table_form.pas"/>
+        <Caret Line="231" Column="79" TopLine="207"/>
       </Position5>
       <Position6>
-        <Filename Value="record_edit_form.pas"/>
-        <Caret Line="112" Column="53" TopLine="79"/>
+        <Filename Value="time_table_form.pas"/>
+        <Caret Line="239" Column="16" TopLine="194"/>
       </Position6>
       <Position7>
-        <Filename Value="record_edit_form.pas"/>
-        <Caret Line="111" Column="23" TopLine="85"/>
+        <Filename Value="time_table_form.pas"/>
+        <Caret Line="240" Column="16" TopLine="195"/>
       </Position7>
       <Position8>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="204" Column="15" TopLine="170"/>
+        <Caret Line="239" Column="16" TopLine="194"/>
       </Position8>
       <Position9>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="205" Column="15" TopLine="171"/>
+        <Caret Line="239" Column="23" TopLine="200"/>
       </Position9>
       <Position10>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="191" Column="52" TopLine="175"/>
+        <Caret Line="240" Column="48" TopLine="214"/>
       </Position10>
       <Position11>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="201" Column="36" TopLine="157"/>
+        <Caret Line="238" Column="66" TopLine="214"/>
       </Position11>
       <Position12>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="39" Column="53" TopLine="13"/>
+        <Caret Line="240" Column="48" TopLine="214"/>
       </Position12>
       <Position13>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="166" Column="33" TopLine="140"/>
+        <Caret Line="239" Column="43" TopLine="214"/>
       </Position13>
       <Position14>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="180" Column="6" TopLine="172"/>
+        <Caret Line="260" Column="48" TopLine="250"/>
       </Position14>
       <Position15>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="232" Column="11" TopLine="191"/>
+        <Caret Line="62" Column="47" TopLine="34"/>
       </Position15>
       <Position16>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="231" Column="79" TopLine="207"/>
+        <Caret Line="242" Column="66" TopLine="219"/>
       </Position16>
       <Position17>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="239" Column="16" TopLine="194"/>
+        <Caret Line="248" Column="64" TopLine="230"/>
       </Position17>
       <Position18>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="240" Column="16" TopLine="195"/>
+        <Caret Line="241" Column="52" TopLine="230"/>
       </Position18>
       <Position19>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="239" Column="16" TopLine="194"/>
+        <Caret Line="62" Column="49" TopLine="15"/>
       </Position19>
       <Position20>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="239" Column="23" TopLine="200"/>
+        <Caret Line="253" Column="5" TopLine="227"/>
       </Position20>
       <Position21>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="240" Column="48" TopLine="214"/>
+        <Caret Line="465" Column="3" TopLine="460"/>
       </Position21>
       <Position22>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="238" Column="66" TopLine="214"/>
+        <Caret Line="103" Column="16" TopLine="106"/>
       </Position22>
       <Position23>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="240" Column="48" TopLine="214"/>
+        <Caret Line="102" Column="16" TopLine="102"/>
       </Position23>
       <Position24>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="239" Column="43" TopLine="214"/>
+        <Caret Line="103" Column="16" TopLine="103"/>
       </Position24>
       <Position25>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="260" Column="48" TopLine="250"/>
+        <Caret Line="104" Column="16" TopLine="104"/>
       </Position25>
       <Position26>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="62" Column="47" TopLine="34"/>
+        <Caret Line="311" Column="69" TopLine="281"/>
       </Position26>
       <Position27>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="242" Column="66" TopLine="219"/>
+        <Caret Line="313" Column="53" TopLine="284"/>
       </Position27>
       <Position28>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="248" Column="64" TopLine="230"/>
+        <Caret Line="349" Column="34" TopLine="304"/>
       </Position28>
       <Position29>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="241" Column="52" TopLine="230"/>
+        <Caret Line="333" Column="59" TopLine="304"/>
       </Position29>
       <Position30>
         <Filename Value="time_table_form.pas"/>
-        <Caret Line="62" Column="49" TopLine="15"/>
+        <Caret Line="348" Column="77" TopLine="301"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>

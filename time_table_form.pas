@@ -20,7 +20,6 @@ type
     AddFilterBtn: TSpeedButton;
     DeleteImage: TImage;
     FiltersBox: TGroupBox;
-    Image1: TImage;
     EditImage: TImage;
     PMAdd: TMenuItem;
     PMenu: TPopupMenu;
@@ -39,10 +38,15 @@ type
     procedure AddFilterBtnClick(Sender: TObject);
     procedure CheckFieldsItemClick(Sender: TObject; Index: integer);
     procedure CloseFilterClick(AFilterIndex: integer);
+    procedure DrawGridDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure DrawGridDragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
     procedure DrawGridDrawCell(Sender: TObject; aCol, aRow: Integer;
       aRect: TRect; aState: TGridDrawState);
     procedure DrawGridHeaderClick(Sender: TObject; IsColumn: Boolean;
       Index: Integer);
+    procedure DrawGridMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
     procedure DrawGridMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure DrawGridMouseUp(Sender: TObject; Button: TMouseButton;
@@ -59,6 +63,7 @@ type
     procedure InitCheckFields;
     procedure DrawTitle(ACol, ARow: integer; ARect: TRect);
     procedure DrawCell(ACol, ARow: integer; ARect: TRect);
+    procedure DragCell(AStartCol, AStartRow, ARecordIndex, AEndCol, AEndRow: integer);
     function GetTitles(AFieldIndex: integer; var ATitleIDs: TIntArray): TStringList;
     function GetTitlesQuery(AFieldIndex: integer): string;
     function GetTriangle(ARect: TRect; ACol, ARow: integer): TPoints;
@@ -74,6 +79,7 @@ type
     FColTitleIDs, FRowTitleIDs: TIntArray;
     FCurHFI, FCurVFI, FCurMDHField, FCurMDVField: integer;
     FCurCol, FCurRow, FCurOrd: integer;
+    FDragStartPos: TPoint;
     FFieldsCount, FDefaultRowHeight, FTextHeight: integer;
     FFilters: TFilters;
   const
@@ -158,6 +164,13 @@ begin
       Polygon(GetTriangle(aRect, aCol, aRow));
     end;
   end;
+end;
+
+procedure TTimeTable.DrawGridMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbLeft then
+    FDragStartPos := Point(X, Y);
 end;
 
 procedure TTimeTable.DrawGridMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -275,6 +288,70 @@ begin
   GetCellData;
   OnPropChange(self);
   SelectBtn.Enabled := False;
+end;
+
+procedure TTimeTable.DrawGridDragOver(Sender, Source: TObject; X, Y: Integer;
+  State: TDragState; var Accept: Boolean);
+var Col, Row: integer;
+begin
+  DrawGrid.MouseToCell(X, Y, Col, Row);
+  Accept := (Col > 0) and (Row > 0);
+end;
+
+procedure TTimeTable.DrawGridDragDrop(Sender, Source: TObject; X, Y: Integer);
+var
+  cRect: TRect;
+  sCol, sRow, RecordIndex, i: integer;
+begin
+  with DrawGrid do begin
+    if FFieldsCount > 0 then begin
+      RecordIndex := -1;
+      cRect := CellRect(Col, Row);
+      cRect.Bottom := cRect.Top + FTextHeight*FFieldsCount+1;
+      for i := 0 to high(FCellData[Col][Row]) do begin
+        if PtInRect(cRect, FDragStartPos) then begin
+          RecordIndex := i;
+          break;
+        end;
+        cRect.Top := cRect.Bottom;
+        cRect.Bottom += FTextHeight*FFieldsCount+1;
+      end;
+
+      if RecordIndex >= 0 then begin
+        MouseToCell(X, Y, sCol, sRow);
+        DragCell(Col, Row, RecordIndex, sCol, sRow);
+      end;
+    end;
+  end
+end;
+
+procedure TTimeTable.DragCell(AStartCol, AStartRow, ARecordIndex, AEndCol, AEndRow: integer);
+var
+  tmp: TStringList;
+  RecID, i: integer;
+begin
+  RecID := FRecordIDs[AStartCol][AStartRow][ARecordIndex];
+  tmp := FCellData[AStartCol][AStartRow][ARecordIndex];
+
+  for i := ARecordIndex to high(FCellData[AStartCol][AStartRow])-1 do begin
+    FCellData[AStartCol][AStartRow][i] := FCellData[AStartCol][AStartRow][i+1];
+    FRecordIDs[AStartCol][AStartRow][i] := FRecordIDs[AStartCol][AStartRow][i+1];
+  end;
+  SetLength(FCellData[AStartCol][AStartRow], Length(FCellData[AStartCol][AStartRow])-1);
+  SetLength(FRecordIDs[AStartCol][AStartRow], Length(FRecordIDs[AStartCol][AStartRow])-1);
+
+  SetLength(FCellData[AEndCol][AEndRow], Length(FCellData[AEndCol][AEndRow])+1);
+  FCellData[AEndCol][AEndRow][high(FCellData[AEndCol][AEndRow])] := tmp;
+  SetLength(FRecordIDs[AEndCol][AEndRow], Length(FRecordIDs[AEndCol][AEndRow])+1);
+  FRecordIDs[AEndCol][AEndRow][high(FRecordIDs[AEndCol][AEndRow])] := RecID;
+
+  DrawGrid.Repaint;
+
+  SQLQuery.SQL.Text :=
+    Format('UPDATE %s SET %s = %d, %s = %d WHERE ID = %d',
+      [FTable.Name, FMDTable.Fields[FCurMDHField].Name, FColTitleIDs[AEndCol-1],
+       FMDTable.Fields[FCurMDVField].Name, FRowTitleIDs[AEndRow-1], RecID]);
+  SQLQuery.ExecSQL;
 end;
 
 procedure TTimeTable.InitFieldBoxes;
