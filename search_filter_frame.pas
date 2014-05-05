@@ -40,11 +40,12 @@ type
     procedure OnFilterChange(Sender: TObject);
     procedure OnFilterClose(AFilterIndex: integer);
     function GetParamQuery: TParamQuery;
+  public
+    FilterEdit: TFieldEdit;
   private
     FOnChange: TNotifyEvent;
     FOnClose: TCloseFilterEvent;
     FTable: TTableInfo;
-    FFilterEdit: TFieldEdit;
   public
     property OnChange: TNotifyEvent read FOnChange write SetOnChange;
     property OnClose: TCloseFilterEvent read FOnClose write FOnClose;
@@ -69,26 +70,26 @@ begin
   FOnChange := AOnChange;
   ApplyFilter.OnChange := FOnChange;
   OperBox.OnChange := FOnChange;
-  FFilterEdit.OnChange := FOnChange;
+  FilterEdit.OnChange := FOnChange;
 end;
 
 function TFilterFrame.GetParamQuery: TParamQuery;
 var FieldName: string;
 begin
   Result.SQL := '';
-  if FFilterEdit.Value = '' then Exit;
+  if FilterEdit.Value = '' then Exit;
 
   FieldName := FTable.GetFullFieldName(FieldBox.ItemIndex);
   Result.ParamName := Format('FilterValue_%d', [Tag]);
-  Result.ParamValue := FFilterEdit.Value;
+  Result.ParamValue := FilterEdit.Value;
 
   case FTable.Fields[FieldBox.ItemIndex].DataType of
   dtStr:
     case OperBox.ItemIndex of
-    0:
+    5:
       Result.SQL :=
         Format('POSITION(UPPER(:%s), UPPER(%s)) > 0', [Result.ParamName, FieldName]);
-    1:
+    6:
       Result.SQL :=
         Format('POSITION(UPPER(:%s), UPPER(%s)) = 1', [Result.ParamName, FieldName])
     else
@@ -113,22 +114,22 @@ end;
 procedure TFilterFrame.InitOperBox(ADataType: TDataType);
 begin
   OperBox.Items.Clear;
-  if ADataType = dtStr then begin
-    OperBox.Items.Add('Cодержит');
-    OperBox.Items.Add('Начинается с');
-  end;
+  OperBox.Items.Add('=');
   OperBox.Items.Add('>');
   OperBox.Items.Add('<');
   OperBox.Items.Add('>=');
   OperBox.Items.Add('<=');
-  OperBox.Items.Add('=');
+  if ADataType = dtStr then begin
+    OperBox.Items.Add('Cодержит');
+    OperBox.Items.Add('Начинается с');
+  end;
   OperBox.ItemIndex := 0;
 end;
 
 procedure TFilterFrame.InitFilterEdit(ADataType: TDataType);
 begin
-  FFilterEdit.Free;
-  FFilterEdit := GetEditClass(ADataType).Create(FilterBox, 2, 31, 265, 27);
+  FilterEdit.Free;
+  FilterEdit := GetEditClass(ADataType).Create(FilterBox, 2, 31, 265, 27);
 end;
 
 procedure TFilterFrame.FieldBoxChange(Sender: TObject);

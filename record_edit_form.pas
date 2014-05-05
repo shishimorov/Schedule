@@ -26,15 +26,11 @@ type
     procedure OKButtonClick(Sender: TObject);
   public
     constructor Create(TheOwner: TComponent; ATable: TTableInfo;
-      AfterInsertAction: TNotifyEvent); overload;
-    constructor Create(TheOwner: TComponent; ATable: TTableInfo;
-      AfterInsertAction: TNotifyEvent; DisabledFields: TDisabledFields); overload;
+      AfterInsertAction: TNotifyEvent; ADisabledFields: TDisabledFields); overload;
     constructor Create(TheOwner: TComponent; ATable: TTableInfo; ARecordID: integer;
-      AfterEditAction: TNotifyEvent); overload;
-    constructor Create(TheOwner: TComponent; ATable: TTableInfo; ARecordID: integer;
-      AfterEditAction: TNotifyEvent; DisabledFields: TDisabledFields); overload;
+      AfterEditAction: TNotifyEvent; ADisabledFields: TDisabledFields); overload;
   private
-    procedure InitComponents;
+    procedure InitComponents(ADisabledFields: TDisabledFields);
   public
     FieldEdits: array of TFieldEdit;
   private
@@ -58,33 +54,26 @@ implementation
 { TEditForm }
 
 constructor TEditForm.Create(TheOwner: TComponent; ATable: TTableInfo;
-  AfterInsertAction: TNotifyEvent);
+  AfterInsertAction: TNotifyEvent; ADisabledFields: TDisabledFields);
+var i: integer;
 begin
   inherited Create(TheOwner);
-  Caption := 'Вставка';
+  Caption := 'Добавление';
   FMode := qmInsert;
   FTable := ATable;
   FAfterAction := AfterInsertAction;
-  InitComponents;
+  InitComponents(ADisabledFields);
 
-  SQLQuery.SQL.Text :=
-    Format('SELECT GEN_ID(%s, 0) FROM RDB$DATABASE', [FTable.Name+'_ID']);
-  SQLQuery.Open;
-  FieldEdits[0].Value := IntToStr(SQLQuery.Fields[0].AsInteger+1);
+  //SQLQuery.SQL.Text :=
+  //  Format('SELECT GEN_ID(%s, 0) FROM RDB$DATABASE', [FTable.Name+'_ID']);
+  //SQLQuery.Open;
+  //FieldEdits[0].Value := IntToStr(SQLQuery.Fields[0].AsInteger+1);
+  FieldEdits[0].Value := 'Автогенерация';
   SQLQuery.Close;
 end;
 
 constructor TEditForm.Create(TheOwner: TComponent; ATable: TTableInfo;
-  AfterInsertAction: TNotifyEvent; DisabledFields: TDisabledFields);
-var i: integer;
-begin
-  Create(TheOwner, ATable, AfterInsertAction);
-  for i := 0 to high(FieldEdits) do
-    if i in DisabledFields then FieldEdits[i].Enabled := False;
-end;
-
-constructor TEditForm.Create(TheOwner: TComponent; ATable: TTableInfo;
-  ARecordID: integer; AfterEditAction: TNotifyEvent);
+  ARecordID: integer; AfterEditAction: TNotifyEvent; ADisabledFields: TDisabledFields);
 var i: integer;
 begin
   inherited Create(TheOwner);
@@ -93,7 +82,7 @@ begin
   FTable := ATable;
   FRecordID := ARecordID;
   FAfterAction := AfterEditAction;
-  InitComponents;
+  InitComponents(ADisabledFields);
 
   SQLQuery.SQL := FTable.SQL;
   SQLQuery.SQL.Strings[WHERE_IND] := Format('WHERE %s.ID = %d', [FTable.Name, ARecordID]);
@@ -106,15 +95,6 @@ begin
         FieldEdits[i].Value := SQLQuery.FieldByName(GetColumnName(i)).Value;
     end;
   SQLQuery.Close;
-end;
-
-constructor TEditForm.Create(TheOwner: TComponent; ATable: TTableInfo;
-  ARecordID: integer; AfterEditAction: TNotifyEvent; DisabledFields: TDisabledFields);
-var i: integer;
-begin
-  Create(TheOwner, ATable, ARecordID, AfterEditAction);
-  for i := 0 to high(FieldEdits) do
-    if i in DisabledFields then FieldEdits[i].Enabled := False;
 end;
 
 procedure TEditForm.OKButtonClick(Sender: TObject);
@@ -167,7 +147,7 @@ begin
   Close;
 end;
 
-procedure TEditForm.InitComponents;
+procedure TEditForm.InitComponents(ADisabledFields: TDisabledFields);
 var
   Edit: TEdit;
   i: integer;
@@ -209,6 +189,8 @@ begin
     else
       FieldEdits[i] :=
         GetEditClass(FTable.Fields[i].DataType).Create(self, 200, i*32+10, 180, 27);
+
+    if i in ADisabledFields then FieldEdits[i].Enabled := False;
   end;
 end;
 

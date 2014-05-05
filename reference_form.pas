@@ -39,10 +39,11 @@ type
   private
     procedure AfterEditAction(Sender: TObject);
     procedure RemoveInvalidPointers;
+  public
+    SearchFrame: TSearchFrame;
   private
     FTable: TTableInfo;
     FEditForms: TEditForms;
-    FSearchFrame: TSearchFrame;
     FSortedColInd: integer;
   const
     MaxEditForms = 10;
@@ -154,10 +155,10 @@ end;
 
 procedure TRefForm.InitSearchFrame;
 begin
-  FSearchFrame := TSearchFrame.Create(FilterPanel, FTable, SQLQuery);
-  FSearchFrame.Left := 2;
-  FSearchFrame.Top := 2;
-  FilterPanel.InsertControl(FSearchFrame);
+  SearchFrame := TSearchFrame.Create(FilterPanel, FTable, SQLQuery);
+  SearchFrame.Left := 2;
+  SearchFrame.Top := 2;
+  FilterPanel.InsertControl(SearchFrame);
 end;
 
 procedure TRefForm.AfterEditAction(Sender: TObject);

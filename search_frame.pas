@@ -36,12 +36,13 @@ type
     procedure InitSearchEdit(ADataType: TDataType);
     procedure InitSearchBtn(ALeft, ATop: integer);
     procedure UpdateTable;
+  public
+    Filters: TFilters;
   private
     FTable: TTableInfo;
     FSQLQuery: TSQLQuery;
     FSearchEdit: TFieldEdit;
     FSearchBtn: TSpeedButton;
-    FFilters: TFilters;
   end;
 
 function AddFilter(TheOwner: TGroupBox; var AFilters: TFilters; ATable: TTableInfo): TFilterFrame;
@@ -120,7 +121,7 @@ begin
   else FSQLQuery.SQL.Strings[WHERE_IND] := '';
 
   if ApplyFilters.Checked then
-    GetFiltersSQL(FFilters, FSQLQuery);
+    GetFiltersSQL(Filters, FSQLQuery);
 
   FSQLQuery.Open;
 end;
@@ -147,7 +148,7 @@ end;
 procedure TSearchFrame.AddFilterBtnClick(Sender: TObject);
 var NewFilter: TFilterFrame;
 begin
-  NewFilter := AddFilter(FiltersBox, FFilters, FTable);
+  NewFilter := AddFilter(FiltersBox, Filters, FTable);
   if NewFilter <> nil then
     with NewFilter do begin
       OnChange := @self.SearchQueryChange;
@@ -158,8 +159,8 @@ end;
 
 procedure TSearchFrame.CloseFilterClick(AFilterIndex: integer);
 begin
-  Height := Height-FFilters[AFilterIndex].Height;
-  CloseFilter(FiltersBox, FFilters, AFilterIndex);
+  Height := Height-Filters[AFilterIndex].Height;
+  CloseFilter(FiltersBox, Filters, AFilterIndex);
   SearchQueryChange(self);
 end;
 

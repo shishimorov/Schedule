@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, db, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs,
   Grids, ExtCtrls, StdCtrls, Menus, Buttons, search_frame, search_filter_frame,
-  metadata, math, lazregions, DbCtrls, types, record_edit_form;
+  metadata, math, lazregions, DbCtrls, types, record_edit_form, reference_form;
 
 type
 
@@ -21,6 +21,7 @@ type
     DeleteImage: TImage;
     FiltersBox: TGroupBox;
     EditImage: TImage;
+    PMRef: TMenuItem;
     PMAdd: TMenuItem;
     PMenu: TPopupMenu;
     ShowFieldNames: TCheckBox;
@@ -54,6 +55,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure HorizontalFieldBoxChange(Sender: TObject);
     procedure PMAddClick(Sender: TObject);
+    procedure PMRefClick(Sender: TObject);
     procedure SelectBtnClick(Sender: TObject);
     procedure OnPropChange(Sender: TObject);
     procedure OnFilterChange(Sender: TObject);
@@ -64,12 +66,18 @@ type
     procedure DrawTitle(ACol, ARow: integer; ARect: TRect);
     procedure DrawCell(ACol, ARow: integer; ARect: TRect);
     procedure DragCell(AStartCol, AStartRow, ARecordIndex, AEndCol, AEndRow: integer);
+    procedure DrawIcons(ACol, ARow, ATop: integer);
+    procedure DrawTriangle(ARect: TRect; ACol, ARow: integer);
+    procedure OnTriangleClick(Sender: TObject);
+    procedure OnEditBtnClick(ARecordID: integer);
+    procedure OnDeleteBtnClick(ARecordID: integer);
     function GetTitles(AFieldIndex: integer; var ATitleIDs: TIntArray): TStringList;
     function GetTitlesQuery(AFieldIndex: integer): string;
     function GetTriangle(ARect: TRect; ACol, ARow: integer): TPoints;
+    function GetEditBtnRect(ACol, ARow, ARecordIndex: integer): TRect;
+    function GetDeleteBtnRect(ACol, ARow, ARecordIndex: integer): TRect;
     procedure GetCellData;
     procedure ClearCellData;
-    procedure PrepareCanvas;
     procedure AfterEditAction(Sender: TObject);
   private
     FTable, FMDTable: TTableInfo;
@@ -108,7 +116,6 @@ end;
 procedure TTimeTable.DrawGridDrawCell(Sender: TObject; aCol, aRow: Integer;
   aRect: TRect; aState: TGridDrawState);
 begin
-  PrepareCanvas;
   if (aCol = 0) and (aRow = 0) then Exit;
   if (aCol = 0) xor (aRow = 0) then begin
     DrawTitle(aCol, aRow, aRect);
@@ -144,25 +151,36 @@ begin
         end;
       end;
       if FFieldsCount > 0 then begin
-        if (FCurCol > 0) and (FCurRow > 0) and (FCurCol = aCol) and (FCurRow = aRow) and
-           (FCurOrd > CurTop) and (FCurOrd < CurTop+FTextHeight*FFieldsCount)
-        then begin
-          Draw(aRect.Right-34, CurTop+1, EditImage.Picture.Bitmap);
-          Draw(aRect.Right-17, CurTop, DeleteImage.Picture.Bitmap);
-        end;
+        DrawIcons(aCol, aRow, CurTop);
         CurTop += FTextHeight*FFieldsCount+1;
         MoveTo(aRect.Left, CurTop);
         LineTo(aRect.Right, CurTop);
       end;
     end;
+    DrawTriangle(aRect, aCol, aRow);
+  end;
+end;
 
-    if (DrawGrid.RowHeights[aRow] < FDefaultRowHeight*Length(FCellData[aCol][aRow])) and
-       (Length(FCellData[aCol][aRow]) > 1)
-    then begin
-      Brush.Style := bsSolid;
-      Brush.Color := clBlack;
-      Polygon(GetTriangle(aRect, aCol, aRow));
-    end;
+procedure TTimeTable.DrawIcons(ACol, ARow, ATop: integer);
+var Rect: TRect;
+begin
+  if (FCurCol > 0) and (FCurRow > 0) and (FCurCol = aCol) and (FCurRow = aRow) and
+     (FCurOrd > ATop) and (FCurOrd < ATop+FTextHeight*FFieldsCount)
+  then begin
+    Rect := DrawGrid.CellRect(ACol, ARow);
+    DrawGrid.Canvas.Draw(Rect.Right-34, ATop+1, EditImage.Picture.Bitmap);
+    DrawGrid.Canvas.Draw(Rect.Right-17, ATop, DeleteImage.Picture.Bitmap);
+  end;
+end;
+
+procedure TTimeTable.DrawTriangle(ARect: TRect; ACol, ARow: integer);
+begin
+  if (DrawGrid.RowHeights[ARow] < FDefaultRowHeight*Length(FCellData[ACol][ARow])) and
+     (Length(FCellData[ACol][ARow]) > 1)
+  then begin
+    DrawGrid.Canvas.Brush.Style := bsSolid;
+    DrawGrid.Canvas.Brush.Color := clBlack;
+    DrawGrid.Canvas.Polygon(GetTriangle(ARect, ACol, ARow));
   end;
 end;
 
@@ -190,68 +208,90 @@ end;
 procedure TTimeTable.DrawGridMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
-  EditForm: TEditForm;
-  EditBtnRect, DelBtnRect: TRect;
   pCol, pRow: integer;
   i: integer;
 begin
+  if (DrawGrid.Row <= 0) and (DrawGrid.Col <= 0) then Exit;
   with DrawGrid do
-    if (Row > 0) and (Col > 0) then begin
-      if Button = mbLeft then begin
+    case Button of
+    mbLeft:
+      begin
+        if FFieldsCount = 0 then Exit;
         if RowHeights[Row] < FDefaultRowHeight*Length(FCellData[Col][Row]) then
           if IsPointInPolygon(X, Y, GetTriangle(CellRect(Col, Row), Col, Row)) then begin
-            RowHeights[Row] := FDefaultRowHeight*Length(FCellData[Col][Row]);
+            OnTriangleClick(self);
             Exit;
           end;
 
-        EditBtnRect := CellRect(Col, Row);
-        with EditBtnRect do begin
-          Left := Right-34;
-          Right := Right-18;
-          Top := Top+1;
-          Bottom := Top+16;
-        end;
-        DelBtnRect := EditBtnRect;
-        with DelBtnRect do begin
-          Left := Left+17;
-          Right := Right+17;
-        end;
-        if FFieldsCount > 0 then begin
-          for i := 0 to high(FCellData[Col][Row]) do begin
-            if PtInRect(EditBtnRect, Point(X, Y)) then begin
-              EditForm := TEditForm.Create(self, FMDTable, FRecordIDs[Col][Row][i],
-                @AfterEditAction, [0, FCurMDHField, FCurMDVField]);
-              EditForm.ShowModal;
-              Exit;
-            end
-            else if PtInRect(DelBtnRect, Point(X, Y)) then begin
-              if Application.MessageBox('Вы действительно хотите удалить данную запись?',
-                'Подтверждение', (4+48)) = 6
-              then begin
-                SQLQuery.SQL.Text := Format('DELETE FROM %s WHERE ID = %d',
-                  [FTable.Name, FRecordIDs[Col][Row][i]]);
-                SQLQuery.ExecSQL;
-                AfterEditAction(self);
-              end;
-              Exit;
-            end;
-            EditBtnRect.Top += FTextHeight*FFieldsCount+1;
-            EditBtnRect.Bottom := EditBtnRect.Top+16;
-            DelBtnRect.Top := EditBtnRect.Top;
-            DelBtnRect.Bottom := EditBtnRect.Bottom;
+        for i := 0 to high(FCellData[Col][Row]) do begin
+          if PtInRect(GetEditBtnRect(Col, Row, i), Point(X, Y)) then begin
+            OnEditBtnClick(FRecordIDs[Col][Row][i]);
+            Exit;
+          end;
+          if PtInRect(GetDeleteBtnRect(Col, Row, i), Point(X, Y)) then begin
+            OnDeleteBtnClick(FRecordIDs[Col][Row][i]);
+            Exit;
           end;
         end;
-      end
-      else
-        if (Button = mbRight) then begin
-          MouseToCell(X, Y, pCol, pRow);
-          if (pCol > 0) and (pRow > 0) then begin
-            Col := pCol;
-            Row := pRow;
-            PMenu.Popup(Mouse.CursorPos.X, Mouse.CursorPos.Y);
-          end;
+      end;
+    mbRight:
+      begin
+        MouseToCell(X, Y, pCol, pRow);
+        if (pCol > 0) and (pRow > 0) then begin
+          Col := pCol;
+          Row := pRow;
+          PMenu.Popup(Mouse.CursorPos.X, Mouse.CursorPos.Y);
         end;
+      end;
     end;
+end;
+
+function TTimeTable.GetEditBtnRect(ACol, ARow, ARecordIndex: integer): TRect;
+begin
+  Result := DrawGrid.CellRect(ACol, ARow);
+  with Result do begin
+    Left := Right-34;
+    Right := Right-18;
+    Top := Top + ARecordIndex*(FTextHeight*FFieldsCount+1);
+    Bottom := Top+16;
+  end;
+end;
+
+function TTimeTable.GetDeleteBtnRect(ACol, ARow, ARecordIndex: integer): TRect;
+begin
+  Result := DrawGrid.CellRect(ACol, ARow);
+  with Result do begin
+    Left := Left+17;
+    Right := Right+17;
+    Top := Top + ARecordIndex*(FTextHeight*FFieldsCount+1);
+    Bottom := Top+16;
+  end;
+end;
+
+procedure TTimeTable.OnTriangleClick(Sender: TObject);
+begin
+  with DrawGrid do
+    RowHeights[Row] := FDefaultRowHeight*Length(FCellData[Col][Row]);
+end;
+
+procedure TTimeTable.OnEditBtnClick(ARecordID: integer);
+var EditForm: TEditForm;
+begin
+  EditForm := TEditForm.Create(self, FMDTable, ARecordID, @AfterEditAction,
+    [0, FCurMDHField, FCurMDVField]);
+  EditForm.ShowModal;
+end;
+
+procedure TTimeTAble.OnDeleteBtnClick(ARecordID: integer);
+begin
+  if Application.MessageBox('Вы действительно хотите удалить данную запись?',
+     'Подтверждение', (4+48)) = 6
+   then begin
+     SQLQuery.SQL.Text :=
+       Format('DELETE FROM %s WHERE ID = %d', [FTable.Name, ARecordID]);
+     SQLQuery.ExecSQL;
+     AfterEditAction(self);
+   end;
 end;
 
 procedure TTimeTable.PMAddClick(Sender: TObject);
@@ -259,11 +299,34 @@ var EditForm: TEditForm;
 begin
   EditForm := TEditForm.Create(self, FMDTable, @AfterEditAction, [0, FCurMDHField, FCurMDVField]);
   with EditForm do begin
-    FieldEdits[0].Value := 'Авто генерация';
     FieldEdits[FCurMDHField].Value := FColTitleIDs[DrawGrid.Col-1];
     FieldEdits[FCurMDVField].Value := FRowTitleIDs[DrawGrid.Row-1];
     Show;
   end;
+end;
+
+procedure TTimeTable.PMRefClick(Sender: TObject);
+var
+  RefForm: TRefForm;
+
+  procedure AddFilter(AIndex: integer; AValue: string);
+  begin
+    with RefForm.SearchFrame do begin
+      AddFilterBtnClick(self);
+      with Filters[high(Filters)] do begin
+        FieldBox.ItemIndex := AIndex;
+        FieldBoxChange(self);
+        FilterEdit.Value := AValue;
+      end;
+    end;
+  end;
+
+begin
+  RefForm := TRefForm.Create(self, FMDTable);
+  AddFilter(FCurMDHField, FColTitles[DrawGrid.Col-1]);
+  AddFilter(FCurMDVField, FRowTitles[DrawGrid.Row-1]);
+  RefForm.SearchFrame.SearchBtnClick(self);
+  RefForm.Show;
 end;
 
 procedure TTimeTable.DrawGridHeaderClick(Sender: TObject; IsColumn: Boolean;
@@ -274,6 +337,7 @@ begin
 end;
 
 procedure TTimeTable.SelectBtnClick(Sender: TObject);
+var i: integer;
 begin
   InitCheckFields;
 
@@ -288,6 +352,9 @@ begin
   GetCellData;
   OnPropChange(self);
   SelectBtn.Enabled := False;
+
+  for i := 1 to DrawGrid.RowCount-1 do
+    DrawGrid.RowHeights[i] := DrawGrid.DefaultRowHeight;
 end;
 
 procedure TTimeTable.DrawGridDragOver(Sender, Source: TObject; X, Y: Integer;
@@ -327,11 +394,11 @@ end;
 
 procedure TTimeTable.DragCell(AStartCol, AStartRow, ARecordIndex, AEndCol, AEndRow: integer);
 var
-  tmp: TStringList;
+  Cell: TStringList;
   RecID, i: integer;
 begin
   RecID := FRecordIDs[AStartCol][AStartRow][ARecordIndex];
-  tmp := FCellData[AStartCol][AStartRow][ARecordIndex];
+  Cell := FCellData[AStartCol][AStartRow][ARecordIndex];
 
   for i := ARecordIndex to high(FCellData[AStartCol][AStartRow])-1 do begin
     FCellData[AStartCol][AStartRow][i] := FCellData[AStartCol][AStartRow][i+1];
@@ -341,7 +408,7 @@ begin
   SetLength(FRecordIDs[AStartCol][AStartRow], Length(FRecordIDs[AStartCol][AStartRow])-1);
 
   SetLength(FCellData[AEndCol][AEndRow], Length(FCellData[AEndCol][AEndRow])+1);
-  FCellData[AEndCol][AEndRow][high(FCellData[AEndCol][AEndRow])] := tmp;
+  FCellData[AEndCol][AEndRow][high(FCellData[AEndCol][AEndRow])] := Cell;
   SetLength(FRecordIDs[AEndCol][AEndRow], Length(FRecordIDs[AEndCol][AEndRow])+1);
   FRecordIDs[AEndCol][AEndRow][high(FRecordIDs[AEndCol][AEndRow])] := RecID;
 
@@ -532,17 +599,6 @@ procedure TTimeTable.CloseFilterClick(AFilterIndex: integer);
 begin
   FiltersBox.Height := FiltersBox.Height-FFilters[AFilterIndex].Height;
   CloseFilter(FiltersBox, FFilters, AFilterIndex);
-end;
-
-procedure TTimeTable.PrepareCanvas;
-begin
-  with DrawGrid.Canvas do begin
-    Pen.Color := clBlack;
-    Brush.Color := clBlack;
-    Font.Color := clBlack;
-    Pen.Style := psSolid;
-    Brush.Style := bsClear;
-  end;
 end;
 
 procedure TTimeTable.AfterEditAction(Sender: TObject);
