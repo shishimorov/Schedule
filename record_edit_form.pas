@@ -55,7 +55,6 @@ implementation
 
 constructor TEditForm.Create(TheOwner: TComponent; ATable: TTableInfo;
   AfterInsertAction: TNotifyEvent; ADisabledFields: TDisabledFields);
-var i: integer;
 begin
   inherited Create(TheOwner);
   Caption := 'Добавление';

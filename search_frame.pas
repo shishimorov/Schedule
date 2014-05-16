@@ -31,6 +31,7 @@ type
   public
     constructor Create(TheOwner: TComponent; ATable: TTableInfo;
       ASQLQuery: TSQLQuery); overload;
+    procedure AddFilter(AFieldIndex: integer; AValue: string);
   private
     procedure InitFieldBox;
     procedure InitSearchEdit(ADataType: TDataType);
@@ -148,7 +149,7 @@ end;
 procedure TSearchFrame.AddFilterBtnClick(Sender: TObject);
 var NewFilter: TFilterFrame;
 begin
-  NewFilter := AddFilter(FiltersBox, Filters, FTable);
+  NewFilter := search_frame.AddFilter(FiltersBox, Filters, FTable);
   if NewFilter <> nil then
     with NewFilter do begin
       OnChange := @self.SearchQueryChange;
@@ -162,6 +163,16 @@ begin
   Height := Height-Filters[AFilterIndex].Height;
   CloseFilter(FiltersBox, Filters, AFilterIndex);
   SearchQueryChange(self);
+end;
+
+procedure TSearchFrame.AddFilter(AFieldIndex: integer; AValue: string);
+begin
+  AddFilterBtnClick(self);
+  with Filters[high(Filters)] do begin
+    FieldBox.ItemIndex := AFieldIndex;
+    FieldBoxChange(self);
+    FilterEdit.Value := AValue;
+  end;
 end;
 
 function AddFilter(TheOwner: TGroupBox; var AFilters: TFilters; ATable: TTableInfo): TFilterFrame;

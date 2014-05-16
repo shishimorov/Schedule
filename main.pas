@@ -6,7 +6,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
-  DbCtrls, EditBtn, StdCtrls, reference_form, metadata, data, time_table_form;
+  DbCtrls, EditBtn, StdCtrls, reference_form, metadata, time_table_form,
+  conflict_form;
 
 type
 
@@ -62,6 +63,8 @@ begin
   TimeTable.Free;
   TimeTable := TTimeTable.Create(self);
   TimeTable.Show;
+  //ConflictForm := TConflictForm.Create(self);
+  ConflictForm.Show;
 end;
 
 procedure TMainForm.MRefClick(Sender: TObject);

@@ -7,7 +7,8 @@ interface
 uses
   Classes, SysUtils, db, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs,
   Grids, ExtCtrls, StdCtrls, Menus, Buttons, search_frame, search_filter_frame,
-  metadata, math, lazregions, DbCtrls, types, record_edit_form, reference_form;
+  metadata, math, lazregions, DbCtrls, ComCtrls, types, record_edit_form,
+  reference_form;
 
 type
 
@@ -306,27 +307,15 @@ begin
 end;
 
 procedure TTimeTable.PMRefClick(Sender: TObject);
-var
-  RefForm: TRefForm;
-
-  procedure AddFilter(AIndex: integer; AValue: string);
-  begin
-    with RefForm.SearchFrame do begin
-      AddFilterBtnClick(self);
-      with Filters[high(Filters)] do begin
-        FieldBox.ItemIndex := AIndex;
-        FieldBoxChange(self);
-        FilterEdit.Value := AValue;
-      end;
-    end;
-  end;
-
+var RefForm: TRefForm;
 begin
   RefForm := TRefForm.Create(self, FMDTable);
-  AddFilter(FCurMDHField, FColTitles[DrawGrid.Col-1]);
-  AddFilter(FCurMDVField, FRowTitles[DrawGrid.Row-1]);
-  RefForm.SearchFrame.SearchBtnClick(self);
-  RefForm.Show;
+  with RefForm do begin
+    SearchFrame.AddFilter(FCurMDHField, FColTitles[DrawGrid.Col-1]);
+    SearchFrame.AddFilter(FCurMDVField, FRowTitles[DrawGrid.Row-1]);
+    SearchFrame.SearchBtnClick(self);
+    Show;
+  end;
 end;
 
 procedure TTimeTable.DrawGridHeaderClick(Sender: TObject; IsColumn: Boolean;

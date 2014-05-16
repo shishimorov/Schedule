@@ -5,7 +5,7 @@ unit metadata;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, Dialogs;
 
 const
   SELECT_IND = 0;
@@ -71,9 +71,21 @@ type
     Tables: TTables;
   end;
 
+  TConfNode = array of TStringList;
+
+  TConflict = class(TObject)
+  public
+    constructor Create(AName, ASQL: string; AGroupField: integer);
+  public
+    Name, SQL: string;
+    GroupField: integer;
+    Data: array of TConfNode;
+  end;
+
 var
   MData: TMetaData;
   TimeTableMData: TMetaData;
+  Conflicts: array of TConflict;
 
 implementation
 
@@ -288,9 +300,30 @@ begin
     end;
 end;
 
+constructor TConflict.Create(AName, ASQL: string; AGroupField: integer);
+begin
+  Name := AName;
+  GroupField := AGroupField;
+  SQL := ASQL;
+end;
+
+function AddConflict(AName, ASQL: string; AGroupField: integer): TConflict;
+begin
+  SetLength(Conflicts, Length(Conflicts)+1);
+  Conflicts[high(Conflicts)] := TConflict.Create(AName, ASQL, AGroupField);
+  Result := Conflicts[high(Conflicts)];
+end;
+
+procedure RegisterConflicts;
+begin
+  AddConflict('Одновременно несколько пар в одной аудитории', 'SELECT DISTINCT s1.ID, SUBJECTS.NAME, SUBJECT_TYPES.NAME, PROFESSORS.NAME, LESSONS."Begin", DAYS.NAME, GROUPS.NAME, ROOMS.NAME, WEEKS.NAME FROM SCHEDULE_ITEMS s1 INNER JOIN SCHEDULE_ITEMS s2 ON s1.WEEK_ID = s2.WEEK_ID and s1.DAY_INDEX = s2.DAY_INDEX and s1.LESSON_INDEX = s2.LESSON_INDEX and s1.ROOM_ID = s2.ROOM_ID and s1.ID <> s2.ID and (s1.SUBJECT_ID <> s2.SUBJECT_ID or s1.SUBJECT_TYPE_ID <> s2.SUBJECT_TYPE_ID) INNER JOIN SUBJECTS ON s1.SUBJECT_ID = SUBJECTS.ID INNER JOIN SUBJECT_TYPES ON s1.SUBJECT_TYPE_ID = SUBJECT_TYPES.ID INNER JOIN PROFESSORS ON s1.PROFESSOR_ID = PROFESSORS.ID INNER JOIN LESSONS ON s1.LESSON_INDEX = LESSONS."Index" INNER JOIN DAYS ON s1.DAY_INDEX = DAYS."Index" INNER JOIN GROUPS ON s1.GROUP_ID = GROUPS.ID INNER JOIN ROOMS ON s1.ROOM_ID = ROOMS.ID INNER JOIN WEEKS on s1.WEEK_ID = WEEKS.ID ORDER BY s1.ROOM_ID', 7);
+  AddConflict('Преподаватель одновременно в нескольких аудиториях', 'SELECT DISTINCT s1.ID, SUBJECTS.NAME, SUBJECT_TYPES.NAME, PROFESSORS.NAME, LESSONS."Begin", DAYS.NAME, GROUPS.NAME, ROOMS.NAME, WEEKS.NAME FROM SCHEDULE_ITEMS s1 INNER JOIN SCHEDULE_ITEMS s2 ON s1.WEEK_ID = s2.WEEK_ID and s1.DAY_INDEX = s2.DAY_INDEX and s1.LESSON_INDEX = s2.LESSON_INDEX and s1.PROFESSOR_ID = s2.PROFESSOR_ID and s1.ID <> s2.ID and s1.ROOM_ID <> s2.ROOM_ID INNER JOIN SUBJECTS ON s1.SUBJECT_ID = SUBJECTS.ID INNER JOIN SUBJECT_TYPES ON s1.SUBJECT_TYPE_ID = SUBJECT_TYPES.ID INNER JOIN PROFESSORS ON s1.PROFESSOR_ID = PROFESSORS.ID INNER JOIN LESSONS ON s1.LESSON_INDEX = LESSONS."Index" INNER JOIN DAYS ON s1.DAY_INDEX = DAYS."Index" INNER JOIN GROUPS ON s1.GROUP_ID = GROUPS.ID INNER JOIN ROOMS ON s1.ROOM_ID = ROOMS.ID INNER JOIN WEEKS on s1.WEEK_ID = WEEKS.ID ORDER BY s1.PROFESSOR_ID', 3);
+end;
+
 initialization
 
 RegisterMetaData;
+RegisterConflicts;
 
 end.
 
