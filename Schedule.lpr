@@ -9,7 +9,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, lazcontrols, main, reference_form, data, metadata, 
 search_frame, db_edit, search_filter_frame,
-  record_edit_form, time_table_form, conflict_form;
+  record_edit_form, time_table_form, conflict_form, schedule_export;
 
 {$R *.res}
 

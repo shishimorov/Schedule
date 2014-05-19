@@ -22,9 +22,13 @@ type
     DeleteImage: TImage;
     FiltersBox: TGroupBox;
     EditImage: TImage;
+    MainMenu: TMainMenu;
+    MSaveHTML: TMenuItem;
+    MSaveAs: TMenuItem;
     PMRef: TMenuItem;
     PMAdd: TMenuItem;
     PMenu: TPopupMenu;
+    SaveDialog: TSaveDialog;
     ShowFieldNames: TCheckBox;
     CheckFields: TCheckGroup;
     DrawGrid: TDrawGrid;
@@ -55,6 +59,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure FormCreate(Sender: TObject);
     procedure HorizontalFieldBoxChange(Sender: TObject);
+    procedure MSaveHTMLClick(Sender: TObject);
     procedure PMAddClick(Sender: TObject);
     procedure PMRefClick(Sender: TObject);
     procedure SelectBtnClick(Sender: TObject);
@@ -80,6 +85,7 @@ type
     procedure GetCellData;
     procedure ClearCellData;
     procedure AfterEditAction(Sender: TObject);
+    procedure SaveToHTML(AFile: string);
   private
     FTable, FMDTable: TTableInfo;
     FCellData: array of array of array of TStringList;
@@ -445,6 +451,12 @@ begin
   FCurHFI := HorizontalFieldBox.ItemIndex;
 end;
 
+procedure TTimeTable.MSaveHTMLClick(Sender: TObject);
+begin
+  if SaveDialog.Execute then
+    SaveToHTML(SaveDialog.FileName);
+end;
+
 procedure TTimeTable.VerticalFieldBoxChange(Sender: TObject);
 begin
   SelectBtn.Enabled := True;
@@ -620,6 +632,85 @@ begin
   DrawGrid.RowHeights[0] := 30;
   DrawGrid.ColWidths[0] := 150;
   DrawGrid.Repaint;
+end;
+
+procedure TTimeTable.SaveToHTML(AFile: string);
+var
+  f: text;
+  str: string;
+  i, j, k, q, z: integer;
+begin
+  System.Assign(f, AFile);
+  Rewrite(f);
+  writeln(f,
+    '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html>' + #13#10 +
+    '<head>' + #13#10 +
+    '<meta http-equiv="content-type" content="text/html; charset=utf-8">' + #13#10 +
+    '<title>Расписание</title>' + #13#10 +
+    '<style>' + #13#10 +
+    'table {' + #13#10 +
+    '  border-right: 1px solid #000000;' + #13#10 +
+    '  border-bottom: 1px solid #000000;}' + #13#10 +
+    'table td {' + #13#10 +
+    '  min-width: 200px;' + #13#10 +
+    '  max-width: 200px;' + #13#10 +
+    '  border-top: 1px solid #000000;' + #13#10 +
+    '  border-left: 1px solid #000000;' + #13#10 +
+    '  font-family: Verdana;' + #13#10 +
+    '  font-size: 10px;' + #13#10 +
+    '  text-align: left;' + #13#10 +
+    '  padding: 3px;' + #13#10 +
+    '  margin: 0px;' + #13#10 +
+    '  vertical-align: top;}' + #13#10 +
+    '.separator {' + #13#10 +
+    '  width: 80%;' + #13#10 +
+    '  height: 1px;' + #13#10 +
+    '  margin: 3px auto 3px auto;' + #13#10 +
+    '  background: #bbbbbb;}' + #13#10 +
+    '.h {' + #13#10 +
+    '  font-weight: bold;' + #13#10 +
+    '  text-align: center;' + #13#10 +
+    '  font-size: 12px;' + #13#10 +
+    '  vertical-align: middle;}' + #13#10 +
+    '</style>' + #13#10 +
+    '</head>' + #13#10);
+
+  write(f,
+    '<body>' + #13#10 +
+    '<table border = "0" cellspacing = "0" cellpadding = "0">' + #13#10 +
+    '<tr valign = "top">' + #13#10 +
+    '<td></td>');
+  for i := 0 to FColTitles.Count-1 do
+    write(f, #13#10 + '<td class = "h">' + FColTitles.Strings[i] + '</td>');
+  writeln(f, #13#10 + '</tr>' + #13#10);
+
+  for i := 0 to FRowTitles.Count-1 do begin
+    writeln(f,
+      '<tr valign = "top">' + #13#10 +
+      '<td class = "h">' + FRowTitles.Strings[i] + '</td>');
+
+    for j := 0 to FColTitles.Count-1 do begin
+      writeln(f, '<td>');
+      for k := 0 to high(FCellData[j+1][i+1]) do begin
+        for q := 0 to FCellData[j+1][i+1][k].Count-1 do begin
+          if not CheckFields.Checked[q] then Continue;
+
+          str := FCellData[j+1][i+1][k].Strings[q];
+          if ShowFieldNames.Checked then
+            str := Format('<b>%s:</b> %s<br />', [CheckFields.Items[q], str]);
+          writeln(f, str);
+        end;
+        writeln(f, '<div class = "separator">&nbsp</div>');
+      end;
+      writeln(f, '</td>');
+    end;
+    writeln(f, '</tr>' + #13#10);
+  end;
+
+  writeln(f,
+    '</table>' + #13#10 +
+    '</body>');
+  System.Close(f);
 end;
 
 end.

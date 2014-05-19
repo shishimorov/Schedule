@@ -1,7 +1,7 @@
 object TimeTable: TTimeTable
-  Left = 138
+  Left = 555
   Height = 690
-  Top = 123
+  Top = 203
   Width = 1160
   HorzScrollBar.Page = 1160
   VertScrollBar.Page = 690
@@ -9,6 +9,7 @@ object TimeTable: TTimeTable
   Caption = 'Расписание'
   ClientHeight = 690
   ClientWidth = 1160
+  Menu = MainMenu
   OnCreate = FormCreate
   LCLVersion = '1.2.0.3'
   object TopPanel: TPanel
@@ -520,6 +521,22 @@ object TimeTable: TTimeTable
         FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
       }
       OnClick = PMRefClick
+    end
+  end
+  object SaveDialog: TSaveDialog
+    DefaultExt = '.html'
+    left = 557
+    top = 279
+  end
+  object MainMenu: TMainMenu
+    left = 368
+    top = 264
+    object MSaveAs: TMenuItem
+      Caption = 'Сохранить как'
+      object MSaveHTML: TMenuItem
+        Caption = 'HTML'
+        OnClick = MSaveHTMLClick
+      end
     end
   end
 end

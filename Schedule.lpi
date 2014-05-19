@@ -43,7 +43,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="11">
+    <Units Count="12">
       <Unit0>
         <Filename Value="Schedule.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -123,6 +123,11 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="conflict_form"/>
       </Unit10>
+      <Unit11>
+        <Filename Value="schedule_export.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="schedule_export"/>
+      </Unit11>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
