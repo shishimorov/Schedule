@@ -7,8 +7,8 @@ interface
 uses
   Classes, SysUtils, db, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs,
   Grids, ExtCtrls, StdCtrls, Menus, Buttons, search_frame, search_filter_frame,
-  metadata, math, lazregions, DbCtrls, ComCtrls, types, record_edit_form,
-  reference_form;
+  metadata, math, lazregions, DbCtrls, types, record_edit_form,
+  reference_form, comobj;
 
 type
 
@@ -23,8 +23,8 @@ type
     FiltersBox: TGroupBox;
     EditImage: TImage;
     MainMenu: TMainMenu;
-    MSaveHTML: TMenuItem;
-    MSaveAs: TMenuItem;
+    MExport: TMenuItem;
+    MFile: TMenuItem;
     PMRef: TMenuItem;
     PMAdd: TMenuItem;
     PMenu: TPopupMenu;
@@ -59,7 +59,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure FormCreate(Sender: TObject);
     procedure HorizontalFieldBoxChange(Sender: TObject);
-    procedure MSaveHTMLClick(Sender: TObject);
+    procedure MExportClick(Sender: TObject);
     procedure PMAddClick(Sender: TObject);
     procedure PMRefClick(Sender: TObject);
     procedure SelectBtnClick(Sender: TObject);
@@ -86,6 +86,7 @@ type
     procedure ClearCellData;
     procedure AfterEditAction(Sender: TObject);
     procedure SaveToHTML(AFile: string);
+    procedure SaveToExcel(AFile: string);
   private
     FTable, FMDTable: TTableInfo;
     FCellData: array of array of array of TStringList;
@@ -451,10 +452,14 @@ begin
   FCurHFI := HorizontalFieldBox.ItemIndex;
 end;
 
-procedure TTimeTable.MSaveHTMLClick(Sender: TObject);
+procedure TTimeTable.MExportClick(Sender: TObject);
 begin
-  if SaveDialog.Execute then
-    SaveToHTML(SaveDialog.FileName);
+  if SaveDialog.Execute then begin
+    case SaveDialog.FilterIndex of
+    1: SaveToHTML(SaveDialog.FileName + '.html');
+    2: SaveToExcel(SaveDialog.FileName + '.xlsx');
+    end;
+  end;
 end;
 
 procedure TTimeTable.VerticalFieldBoxChange(Sender: TObject);
@@ -634,52 +639,165 @@ begin
   DrawGrid.Repaint;
 end;
 
+procedure TTimeTable.SaveToExcel(AFile: string);
+var
+  Excel: Variant;
+  Str: string;
+  MaxRowHeight, RowTitleIndex, RowIndex, i, j, k, z: integer;
+
+  function StrToEx(AStr: string): WideString;
+  begin
+    Result := WideString(UTF8ToSys(AStr));
+  end;
+
+  procedure PrepareLine(ALineIndex: integer);
+  begin
+    Excel.Selection.Borders[ALineIndex].LineStyle := 1;
+    Excel.Selection.Borders[ALineIndex].ColorIndex := -4105;
+    Excel.Selection.Borders[ALineIndex].TintAndShade := 0;
+    Excel.Selection.Borders[ALineIndex].Weight := 4;
+  end;
+
+begin
+  try
+    self.Enabled := False;
+    Excel := CreateOleObject('Excel.Application');
+    Excel.Workbooks.Add;
+    Excel.Visible := False;
+    Excel.Application.DisplayAlerts := False;
+    Excel.Application.EnableEvents := False;
+
+    Excel.Cells[1,1] := StrToEx(VerticalFieldBox.Items[FCurVFI]);
+    RowTitleIndex := 2;
+    for i := 0 to FRowTitles.Count-1 do begin
+      MaxRowHeight := 1;
+      for j := 0 to FColTitles.Count-1 do begin
+        RowIndex := RowTitleIndex;
+        for k := 0 to high(FCellData[j+1][i+1]) do begin
+          if ShowFieldNames.Checked then begin
+          Str := '';
+          for z := 0 to FCellData[j+1][i+1][k].Count-1 do
+            Str += Format('%s: %s',
+              [CheckFields.Items[z], FCellData[j+1][i+1][k].Strings[z]]) + #13#10;
+            Excel.Cells[RowIndex, j+2] := StrToEx(Str);
+          end
+          else
+            Excel.Cells[RowIndex, j+2] := StrToEx(FCellData[j+1][i+1][k].Text);
+          Inc(RowIndex);
+        end;
+        MaxRowHeight := Max(MaxRowHeight, Length(FCellData[j+1][i+1]));
+      end;
+      Excel.Cells[RowTitleIndex, 1] := StrToEx(FRowTitles.Strings[i]);
+      Excel.Range[Excel.Cells[RowTitleIndex, 1], Excel.Cells[RowTitleIndex, FColTitles.Count+1]].Select;
+      PrepareLine(8);
+      RowTitleIndex += MaxRowHeight;
+    end;
+
+    for i := 0 to FColTitles.Count-1 do begin
+      Excel.Cells[1,i+2] := StrToEx(FColTitles.Strings[i]);
+      Excel.Range[Excel.Cells[1,i+2], Excel.Cells[RowTitleIndex-1,i+2]].Select;
+      PrepareLine(7);
+      PrepareLine(9);
+    end;
+
+    Excel.ActiveSheet.ListObjects.Add(1, Excel.Range[Excel.Cells[1,1],
+      Excel.Cells[RowTitleIndex-1, FColTitles.Count+1]], 0, 1).Name := 'TimeTable';
+    Excel.Range[Excel.Cells[1,1], Excel.Cells[RowTitleIndex-1, FColTitles.Count+1]].Select;
+    Excel.ActiveSheet.ListObjects['TimeTable'].TableStyle := 'TableStyleMedium12';
+    Excel.ActiveSheet.ListObjects['TimeTable'].ShowTableStyleFirstColumn := True;
+    Excel.Selection.WrapText := True;
+    Excel.Selection.RowHeight := 110;
+    Excel.Selection.ColumnWidth := 30;
+    Excel.Selection.HorizontalAlignment := -4131;
+    Excel.Selection.VerticalAlignment := -4160;
+    for i := 7 to 10 do PrepareLine(i);
+
+    Excel.Cells[1,1].Select;
+    Excel.ActiveWorkBook.SaveAs(StrToEx(AFile));
+    Excel.ActiveWorkbook.Close;
+    ShowMessage('Экспорт выполнен успешно');
+  finally
+    self.Enabled := True;
+    Excel.Application.Quit;
+  end;
+end;
+
 procedure TTimeTable.SaveToHTML(AFile: string);
 var
   f: text;
   str: string;
-  i, j, k, q, z: integer;
+  i, j, k, q: integer;
 begin
-  System.Assign(f, AFile);
+  System.Assign(f, UTF8ToSys(AFile));
   Rewrite(f);
   writeln(f,
     '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html>' + #13#10 +
-    '<head>' + #13#10 +
-    '<meta http-equiv="content-type" content="text/html; charset=utf-8">' + #13#10 +
-    '<title>Расписание</title>' + #13#10 +
-    '<style>' + #13#10 +
-    'table {' + #13#10 +
-    '  border-right: 1px solid #000000;' + #13#10 +
-    '  border-bottom: 1px solid #000000;}' + #13#10 +
-    'table td {' + #13#10 +
-    '  min-width: 200px;' + #13#10 +
-    '  max-width: 200px;' + #13#10 +
-    '  border-top: 1px solid #000000;' + #13#10 +
-    '  border-left: 1px solid #000000;' + #13#10 +
-    '  font-family: Verdana;' + #13#10 +
-    '  font-size: 10px;' + #13#10 +
-    '  text-align: left;' + #13#10 +
-    '  padding: 3px;' + #13#10 +
-    '  margin: 0px;' + #13#10 +
-    '  vertical-align: top;}' + #13#10 +
-    '.separator {' + #13#10 +
-    '  width: 80%;' + #13#10 +
-    '  height: 1px;' + #13#10 +
-    '  margin: 3px auto 3px auto;' + #13#10 +
-    '  background: #bbbbbb;}' + #13#10 +
-    '.h {' + #13#10 +
-    '  font-weight: bold;' + #13#10 +
-    '  text-align: center;' + #13#10 +
-    '  font-size: 12px;' + #13#10 +
-    '  vertical-align: middle;}' + #13#10 +
-    '</style>' + #13#10 +
-    '</head>' + #13#10);
+    '<head>' +                                                                #13#10 +
+    '<meta http-equiv="content-type" content="text/html; charset=utf-8">' +   #13#10 +
+    '<title>Расписание</title>' +                                             #13#10 +
+    '<style>' +                                                               #13#10 +
+    'table {' +                                                               #13#10 +
+    '  border-right: 1px solid #000000;' +                                    #13#10 +
+    '  border-bottom: 1px solid #000000;' +                                   #13#10 +
+    '  margin: 10px;}' +                                                      #13#10 +
+    'table td {' +                                                            #13#10 +
+    '  min-width: 200px;' +                                                   #13#10 +
+    '  max-width: 200px;' +                                                   #13#10 +
+    '  border-top: 1px solid #000000;' +                                      #13#10 +
+    '  border-left: 1px solid #000000;' +                                     #13#10 +
+    '  font-family: Verdana;' +                                               #13#10 +
+    '  font-size: 10px;' +                                                    #13#10 +
+    '  text-align: left;' +                                                   #13#10 +
+    '  padding: 3px;' +                                                       #13#10 +
+    '  margin: 0px;' +                                                        #13#10 +
+    '  vertical-align: top;}' +                                               #13#10 +
+    '.separator {' +                                                          #13#10 +
+    '  width: 100%;' +                                                        #13#10 +
+    '  height: 1px;' +                                                        #13#10 +
+    '  margin: 3px auto 3px auto;' +                                          #13#10 +
+    '  background: #bbbbbb;}' +                                               #13#10 +
+    '.h {' +                                                                  #13#10 +
+    '  font-weight: bold;' +                                                  #13#10 +
+    '  text-align: center;' +                                                 #13#10 +
+    '  font-size: 12px;' +                                                    #13#10 +
+    '  vertical-align: middle;}' +                                            #13#10 +
+    'fieldset {' +                                                            #13#10 +
+    '  margin: 10px;' +                                                       #13#10 +
+    '  font-size: 12px;' +                                                    #13#10 +
+    '  border: 1px solid #000;}' +                                            #13#10 +
+    'fieldset legend {' +                                                     #13#10 +
+    '  font-size: 13px;}' +                                                   #13#10 +
+    'ol {' +                                                                  #13#10 +
+    '  margin: 5px;}' +                                                       #13#10 +
+    'ol li {' +                                                               #13#10 +
+    '  margin-top: 5px;}' +                                                   #13#10 +
+    '</style>' +                                                              #13#10 +
+    '</head>' +                                                               #13#10 +
+    '<body>');
 
-  write(f,
-    '<body>' + #13#10 +
-    '<table border = "0" cellspacing = "0" cellpadding = "0">' + #13#10 +
-    '<tr valign = "top">' + #13#10 +
+  writeln(f,
+    '<fieldset><legend><strong>Фильтры</strong></legend><ol>' +               #13#10 +
+    '  <li><i>По горизонтали:</i>' +                                          #13#10 +
+       HorizontalFieldBox.Items[FCurHFI] +                                    #13#10 +
+    '  </li>' +                                                               #13#10 +
+    '  <li><i>По вертикали:</i>' +                                            #13#10 +
+       VerticalFieldBox.Items[FCurVFI] +                                      #13#10 +
+    '  </li>');
+
+  for i := 0 to high(FFilters) do begin
+    if FFilters[i].FilterEdit.Value = '' then Continue;
+    writeln(f,
+      '<li><i>' + FFilters[i].FieldBox.Items[FFilters[i].FieldBox.ItemIndex] +
+      ' ' + FFilters[i].OperBox.Items[FFilters[i].OperBox.ItemIndex] +
+      '</i> ' + FFilters[i].FilterEdit.Value + '</li>');
+  end;
+
+  writeln(f,
+    '</ol></fieldset>' +                                                      #13#10 +
+    '<table border = "0" cellspacing = "0" cellpadding = "0">' +              #13#10 +
+    '<tr valign = "top">' +                                                   #13#10 +
     '<td></td>');
+
   for i := 0 to FColTitles.Count-1 do
     write(f, #13#10 + '<td class = "h">' + FColTitles.Strings[i] + '</td>');
   writeln(f, #13#10 + '</tr>' + #13#10);
@@ -707,9 +825,7 @@ begin
     writeln(f, '</tr>' + #13#10);
   end;
 
-  writeln(f,
-    '</table>' + #13#10 +
-    '</body>');
+  writeln(f, '</table>' + #13#10 + '</body>');
   System.Close(f);
 end;
 

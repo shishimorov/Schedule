@@ -4,14 +4,14 @@ object TimeTable: TTimeTable
   Top = 203
   Width = 1160
   HorzScrollBar.Page = 1160
-  VertScrollBar.Page = 690
+  VertScrollBar.Page = 671
   AutoScroll = True
   Caption = 'Расписание'
-  ClientHeight = 690
+  ClientHeight = 671
   ClientWidth = 1160
   Menu = MainMenu
   OnCreate = FormCreate
-  LCLVersion = '1.2.0.3'
+  LCLVersion = '1.2.2.0'
   object TopPanel: TPanel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
@@ -28,12 +28,12 @@ object TimeTable: TTimeTable
       AnchorSideLeft.Control = Horizontal
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = TopPanel
-      Left = 148
-      Height = 29
+      Left = 115
+      Height = 21
       Top = 11
       Width = 150
       BorderSpacing.Top = 10
-      ItemHeight = 0
+      ItemHeight = 13
       OnChange = HorizontalFieldBoxChange
       TabOrder = 0
       Text = 'HorizontalFieldBox'
@@ -42,12 +42,12 @@ object TimeTable: TTimeTable
       AnchorSideLeft.Control = Vertical
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = TopPanel
-      Left = 429
-      Height = 29
+      Left = 369
+      Height = 21
       Top = 11
       Width = 150
       BorderSpacing.Top = 10
-      ItemHeight = 0
+      ItemHeight = 13
       OnChange = VerticalFieldBoxChange
       TabOrder = 1
       Text = 'VerticalFieldBox'
@@ -56,9 +56,9 @@ object TimeTable: TTimeTable
       AnchorSideLeft.Control = TopPanel
       AnchorSideTop.Control = TopPanel
       Left = 16
-      Height = 17
+      Height = 13
       Top = 16
-      Width = 117
+      Width = 84
       BorderSpacing.Around = 15
       Caption = 'По горизонтали:'
       ParentColor = False
@@ -67,10 +67,10 @@ object TimeTable: TTimeTable
       AnchorSideLeft.Control = HorizontalFieldBox
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = TopPanel
-      Left = 313
-      Height = 17
+      Left = 280
+      Height = 13
       Top = 16
-      Width = 101
+      Width = 74
       BorderSpacing.Around = 15
       Caption = 'По вертикали:'
       ParentColor = False
@@ -103,11 +103,11 @@ object TimeTable: TTimeTable
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 820
-    Height = 690
+    Height = 671
     Top = 0
     Width = 340
     Anchors = [akTop, akRight, akBottom]
-    ClientHeight = 690
+    ClientHeight = 671
     ClientWidth = 340
     TabOrder = 1
     object CheckFields: TCheckGroup
@@ -147,7 +147,7 @@ object TimeTable: TTimeTable
       Width = 338
       Anchors = [akTop, akLeft, akRight]
       Caption = 'Фильтры'
-      ClientHeight = 51
+      ClientHeight = 52
       ClientWidth = 334
       TabOrder = 1
       object AddFilterBtn: TSpeedButton
@@ -156,7 +156,7 @@ object TimeTable: TTimeTable
         AnchorSideBottom.Side = asrBottom
         Left = 2
         Height = 32
-        Top = 17
+        Top = 18
         Width = 32
         Anchors = [akLeft, akBottom]
         BorderSpacing.Around = 2
@@ -399,7 +399,7 @@ object TimeTable: TTimeTable
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 642
+    Height = 623
     Top = 48
     Width = 820
     Anchors = [akTop, akLeft, akRight, akBottom]
@@ -425,7 +425,7 @@ object TimeTable: TTimeTable
     OnMouseMove = DrawGridMouseMove
     OnMouseUp = DrawGridMouseUp
   end
-  object Datasource: TDatasource
+  object Datasource: TDataSource
     DataSet = SQLQuery
     Enabled = False
     left = 346
@@ -523,20 +523,20 @@ object TimeTable: TTimeTable
       OnClick = PMRefClick
     end
   end
-  object SaveDialog: TSaveDialog
-    DefaultExt = '.html'
-    left = 557
-    top = 279
-  end
   object MainMenu: TMainMenu
     left = 368
     top = 264
-    object MSaveAs: TMenuItem
-      Caption = 'Сохранить как'
-      object MSaveHTML: TMenuItem
-        Caption = 'HTML'
-        OnClick = MSaveHTMLClick
+    object MFile: TMenuItem
+      Caption = 'Файл'
+      object MExport: TMenuItem
+        Caption = 'Экспорт'
+        OnClick = MExportClick
       end
     end
+  end
+  object SaveDialog: TSaveDialog
+    Filter = 'HTML|.html|Лист Excel|.xlsx'
+    left = 284
+    top = 332
   end
 end
